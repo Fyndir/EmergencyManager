@@ -150,7 +150,7 @@ function swapLatLong (array) { return [array[1], array[0]] }
 function fetchAndDisplayRoute (from, to, mymap) 
 {
     const travelTime = 20000; // the time it takes to get to the destination (in ms)
-    fetch(`http://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full`)
+    fetch(`https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full`)
     .then(r => r.json()).then(data => {
         try {
             data.routes.map(m => {
