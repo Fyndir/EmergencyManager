@@ -1,0 +1,96 @@
+
+body{
+	margin: 0;
+	padding: 0;
+	overflow-x: hidden;
+
+	font-family: 'Pontano Sans', sans-serif;
+}
+
+.center{
+	text-align: center;
+	margin: 0 auto;
+}
+
+.unselectable {
+	/* no selection possible */
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none;   /* Safari */
+	-khtml-user-select: none;    /* Konqueror HTML */
+	-moz-user-select: none;      /* Firefox */
+	-ms-user-select: none;       /* Internet Explorer/Edge */
+	user-select: none;           /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+header, footer {
+	position: relative;
+	width: 100vw;
+    max-width: 100vw;
+}
+
+header {
+    height: 75px;
+	background-color: rgba(192, 57, 43, .7);
+	padding: 10px;
+}
+
+	header .title {
+		position: absolute;
+		top: 50%;
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+
+		font-size: 2em;
+		color: white;
+		margin: 0;
+	}
+
+footer {
+	height: 50px;
+    background-color: rgba(192, 57, 43, .3);
+}
+
+	footer #footerText {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		-ms-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+		margin: 0;
+
+		color: white;
+	}
+
+/* ================================================================================================ */
+
+#content {
+	margin: 0 auto;
+	width: 99vw;
+	max-width: 99vw;
+
+	background-color: rgba(128, 128, 128, .2);
+}
+
+
+#leafletMap {
+	display: inline-block;
+	width: 100%;
+	height: 450px;
+
+	border: 1px solid white;
+}
+
+.leaflet-control-hide-fire, .leaflet-control-hide-truck {
+	position: absolute;
+	top: 0;
+	right: 10px;
+	cursor: pointer !important;
+}
+
+.leaflet-control-hide-fire {
+	/* ... */
+}
+
+.leaflet-control-hide-truck {
+	/* ... */
+}

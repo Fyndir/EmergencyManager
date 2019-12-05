@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+
+	<title>Transversal</title>
+    <meta name="author" content="metheM">
+    <meta name="viewport" content="width=device-width">
+    <meta name='title' content='Projet transversale | Partie Web'>
+    <meta name="description" content="Interface web du projet transversal de CPE Lyon">
+	
+	<!-- Tab icon -->
+	<!-- <link rel="icon" href="../../img/icon.png"> -->
+
+	<!-- EMBED STYLE SHEET -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <!-- Google fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Pontano+Sans&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+</head>
+
+<body>
+
+    <header id='header'>
+        <p class='title'>Fire Monitoring | Simulation</p>
+    </header>
+
+    <div id='content'>
+        <div id="leafletMap"></div>
+    </div>
+
+    <footer>
+        <p id='footerText'>Réalisé par Tom BLANCHET©</p>
+    </footer>
+    
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    <script type='text/javascript' src='script/movingMarker.js'></script>
+    <script type='text/javascript' src='script/polyline.js'></script>
+    <script type='text/javascript' src='script/script.js'></script>
+</body>
+</html>
