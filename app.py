@@ -88,7 +88,7 @@ def queryDatabase():
                                       port=POSTGRES_PORT,
                                       database=POSTGRES_DB_NAME)
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM t_post")
+        cursor.execute("SELECT pos_x,pos_y,pos_i FROM v_post")
         retVal = cursor.fetchall()
 
     except (Exception, psycopg2.Error) as error :
