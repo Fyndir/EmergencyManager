@@ -25,7 +25,8 @@ body{
 header, footer {
 	position: relative;
 	width: 100vw;
-    max-width: 100vw;
+	max-width: 100vw;
+	height: 10vh;
 }
 
 header {
@@ -75,7 +76,7 @@ footer {
 #leafletMap {
 	display: inline-block;
 	width: 100%;
-	height: 450px;
+	height: 80vh;
 
 	border: 1px solid white;
 }

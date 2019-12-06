@@ -1,0 +1,23 @@
+Pour lancer l'environnement Python Flask
+----------------------------------------
+
+Se rendre dans le dossier où on veut utiliser Flask
+> cd xxx/Web/backend
+
+Créer un environnement virtuel Flask nommé 'venv' 
+> py -m venv venv
+
+Activer cet environnement (et accéder à son interface de configuration)
+> venv/Scripts/activate
+
+A partir de ce moment, on entre dans l'environnement et on peut installer flask
+(venv) $ pip install flask
+
+Pour communiquer avec PostgreSQL, nous avons besoin de plusieurs dépendances: SQLAlchemy, Psycopg2, CORS, requests, influxdb_client
+(venv) $ pip install flask-sqlalchemy psycopg2 flask-cors requests influxdb_client
+
+Maintenant, sortir de l'environnement virtuel et entrer le nom du fichier de l'application (ici, app.py)
+> set FLASK_APP=app.py
+
+Pour lancer l'application
+(venv) $ flask run
