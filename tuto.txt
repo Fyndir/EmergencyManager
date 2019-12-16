@@ -2,7 +2,7 @@ Pour lancer l'environnement Python Flask
 ----------------------------------------
 
 Se rendre dans le dossier où on veut utiliser Flask
-> cd xxx/Web/backend
+> cd xxx/Web
 
 Créer un environnement virtuel Flask nommé 'venv' 
 > py -m venv venv
