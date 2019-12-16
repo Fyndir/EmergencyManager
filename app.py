@@ -214,6 +214,7 @@ def root():
 def API_FIRE_GET():
     return jsonify(fetchFirePosition())
 
+#pute
 @app.route('/fire/send', methods=['POST'])
 def API_FIRE_SEND():
     rawData = 'no data'
