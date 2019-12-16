@@ -211,11 +211,11 @@ def root():
 #                             LOCALISATION API ENDPOINTS
 # ---------------------------------------------------------------------------------
 @app.route('/fire/get')
-def API_BASIC():
+def API_FIRE_GET():
     return jsonify(fetchFirePosition())
 
 @app.route('/fire/send', methods=['POST'])
-def handlePostData():
+def API_FIRE_GET():
     rawData = 'no data'
     try:
         # parsing raw data
@@ -242,11 +242,11 @@ def handlePostData():
 #                               FIRETRUCK API ENDPOINTS
 # ---------------------------------------------------------------------------------
 @app.route('/camion/get')
-def API_BASIC():
+def API_CAMION_GET():
     return 'salut g pa coder encore loul'
 
 @app.route('/camion/send', methods=['POST'])
-def handlePostData():
+def API_CAMION_SEND():
     rawData = 'no data'
     try:
         # parsing raw data
