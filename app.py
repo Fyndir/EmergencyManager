@@ -72,7 +72,7 @@ def insertIntoDatabase(allData):
             cursor.close()
             connection.close()
 
-def queryDatabase():
+def fetchFirePosition():
     # PostegreSQL connection variables
     POSTGRES_URL = "raja.db.elephantsql.com"
     POSTGRES_PORT = "5432"
@@ -111,11 +111,14 @@ CORS(app)
 def root():
     return send_from_directory(os.path.join('.', 'static'), 'index.html')
 
-@app.route('/data')
+# ---------------------------------------------------------------------------------
+#                             LOCALISATION API ENDPOINTS
+# ---------------------------------------------------------------------------------
+@app.route('/fire/get')
 def API_BASIC():
-    return jsonify(queryDatabase())
+    return jsonify(fetchFirePosition())
 
-@app.route('/send', methods=['POST'])
+@app.route('/fire/send', methods=['POST'])
 def handlePostData():
     rawData = 'no data'
     try:
@@ -134,6 +137,37 @@ def handlePostData():
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
+        print('just got the fire data below')
+        print(rawData)
+        return rawData
+
+
+# ---------------------------------------------------------------------------------
+#                               FIRETRUCK API ENDPOINTS
+# ---------------------------------------------------------------------------------
+@app.route('/camion/get')
+def API_BASIC():
+    return 'salut g pa coder encore loul'
+
+@app.route('/camion/send', methods=['POST'])
+def handlePostData():
+    rawData = 'no data'
+    try:
+        # parsing raw data
+        # (?) should look like that: 1,2,3;4,5,6;7,8,9[...]
+        rawData = request.data.decode('UTF-8')
+        exploitableData = []
+        for data in rawData.split(';'):
+            subArray = []
+            for atomicData in data.split(','):
+                subArray.append(atomicData)
+
+            exploitableData.append(subArray)
+    except (Exception, psycopg2.Error) as error :
+        print(error)
+    finally:
+        print('just got the camion data below')
+        print(rawData)
         return rawData
 
 # start to send asynchronous data
