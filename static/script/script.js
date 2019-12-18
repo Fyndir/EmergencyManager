@@ -4,9 +4,10 @@ let locationsCoordinates = [];
 let renderedMarkers = {
     fireMarkers: {
         areShown: true,
+        isLocked: false, // if is locked, you can't add to it -> used by the fire marker filter
         markers: []
     },
-    buildingMarker: {
+    buildingMarkers: {
         areShown: true,
         markers: []
     },
@@ -87,17 +88,18 @@ function setupLeaflet ()
             container.style.backgroundImage = 'url("' + IMG_PATH + 'fire/fire1.gif")';
             container.style.backgroundSize = "30px 30px";
         
-            container.onclick = function(){
+            container.onclick = function() {
                 const areMarkersShown = renderedMarkers.fireMarkers.areShown;
+                renderedMarkers.fireMarkers.isLocked = areMarkersShown;
+                renderedMarkers.fireMarkers.areShown = !areMarkersShown;
                 for (let marker of renderedMarkers.fireMarkers.markers) {
-                    if (areMarkersShown) {
-                        renderedMarkers.fireMarkers.areShown = false;
-                        mymap.removeLayer(marker)
-                    } else {
-                        renderedMarkers.fireMarkers.areShown = true;
-                        mymap.addLayer(marker)
-                    }
+                    if (areMarkersShown)
+                        mymap.removeLayer(marker);
+                    else
+                        mymap.addLayer(marker);
                 }
+
+                updateIncendieData([], mymap) // empty array to use already existing data
             }
             return container;
         }
@@ -120,14 +122,12 @@ function setupLeaflet ()
         
             container.onclick = function(){
                 const areMarkersShown = renderedMarkers.truckMarkers.areShown;
+                renderedMarkers.truckMarkers.areShown = !areMarkersShown;
                 for (let marker of renderedMarkers.truckMarkers.markers) {
-                    if (areMarkersShown) {
-                        renderedMarkers.truckMarkers.areShown = false;
-                        mymap.removeLayer(marker)
-                    } else {
-                        renderedMarkers.truckMarkers.areShown = true;
-                        mymap.addLayer(marker)
-                    }
+                    if (areMarkersShown)
+                        mymap.removeLayer(marker);
+                    else
+                        mymap.addLayer(marker);
                 }
             }
             return container;
@@ -187,6 +187,16 @@ function fetchAndDisplayRoute (from, to, mymap)
 // argument, in the 'mymap' Leaflet map
 function addIdleMarker (coordinates, mymap) 
 {
+    // if it is already rendered, gtfo...
+    let isItAlreadyBuffered = false;
+    // let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
+    // for (let association of coordToFilenameMAP) {
+    //     if (areDoubletEqual(coordinates, association.coord)) {
+    //         isItAlreadyBuffered = true;
+    //         break;
+    //     }
+    // }
+
     const fileName = latLongToFileName(coordinates);
     const idleMarkerIcon = L.icon({
         iconUrl: IMG_PATH + fileName,
@@ -195,7 +205,10 @@ function addIdleMarker (coordinates, mymap)
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: idleMarkerIcon}).addTo(mymap);
-    renderedMarkers.buildingMarker.markers.push(marker);
+    // marker._icon.classList.add('leaflet_idleMarker');
+    renderedMarkers.buildingMarkers.markers.push(marker);
+
+    if (!isItAlreadyBuffered) { }
 }
 
 
@@ -240,7 +253,7 @@ function addFirestationMarker (coordinates, mymap) {
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: firestation}).addTo(mymap);
-    renderedMarkers.buildingMarker.markers.push(marker);
+    renderedMarkers.buildingMarkers.markers.push(marker);
 }
 
 
@@ -280,7 +293,7 @@ function addMovingFiretruck (steps, duration, mymap)
     // adding start & end markers
     let startMarker = L.marker(coordinateArray[0], {icon: firestationIcon}).addTo(mymap);
     let endMarker = L.marker(coordinateArray[coordinateArray.length - 1], {icon: fireIcon}).addTo(mymap);
-    renderedMarkers.buildingMarker.markers.push(startMarker);
+    renderedMarkers.buildingMarkers.markers.push(startMarker);
     renderedMarkers.fireMarkers.markers.push(endMarker);
 
     // here is the moving marker (6 seconds animation)
@@ -321,18 +334,23 @@ async function fetchAndDisplayIncendie (mymap) {
 //  In the Leaflet map 'mymap', updates all the displayed data with the new 'newDataset'
 function updateIncendieData (newDataset, mymap) 
 {
-    console.log(newDataset)
     // if no data is already set, render everything
     if (locationsCoordinates.length === 0)
         locationsCoordinates = newDataset;
 
+    let shouldClearMap = true
+    if (newDataset.length === 0) {
+        newDataset = locationsCoordinates;
+        shouldClearMap = false;
+    }
+
     // render everything
     locationsCoordinates = newDataset;
-    clearMap(mymap);
+    if (shouldClearMap) clearMap(mymap);
     for (let data of locationsCoordinates) {
         let coordinates = [data[0], data[1]];
-        let intensity = data[2];
-        if (intensity > 0)
+        let intensity = data[2] + 1;
+        if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked)
             addFireMarker(coordinates, intensity, mymap)
         else
             addIdleMarker(coordinates, mymap)
@@ -352,12 +370,20 @@ async function async_gatherDataRegularly (delay, mymap) {
 // @brief
 //  Clears all the markers rendered in the Leaflet map 'mymap'
 function clearAllMarkers (mymap) {
-    for (let marker of renderedMarkers.fireMarkers.markers)
+    for (let marker of renderedMarkers.fireMarkers.markers) {
         mymap.removeLayer(marker);
-    for (let marker of renderedMarkers.buildingMarker.markers)
+    }
+    for (let marker of renderedMarkers.buildingMarkers.markers) {
+        console.log('clearing idle ')
         mymap.removeLayer(marker);
-    for (let marker of renderedMarkers.truckMarkers.markers)
         mymap.removeLayer(marker);
+    }
+    for (let marker of renderedMarkers.truckMarkers.markers) {
+        mymap.removeLayer(marker);
+    }
+
+    renderedMarkers.fireMarkers.markers = [];
+    renderedMarkers.buildingMarkers.markers = [];
 }
 
 
