@@ -201,7 +201,7 @@ function addIdleMarker (coordinates, mymap)
     const idleMarkerIcon = L.icon({
         iconUrl: IMG_PATH + fileName,
         iconSize:     [40, 30], // size of the icon
-        iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
+        iconAnchor:   [20, 22], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: idleMarkerIcon}).addTo(mymap);
