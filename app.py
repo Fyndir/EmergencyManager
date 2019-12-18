@@ -218,20 +218,29 @@ def API_FIRE_GET():
 @app.route('/fire/send', methods=['POST'])
 def API_FIRE_SEND():
     rawData = 'no data'
-    try:
-        # parsing raw data
-        # (?) should look like that: 1,2,3;4,5,6;7,8,9[...]
-        # rawData = request.data.decode('UTF-8')
-        rawData = request.args
-        exploitableData = []
-        for data in rawData.split(';'):
-            subArray = []
-            for atomicData in data.split(','):
-                subArray.append(atomicData)
 
-            exploitableData.append(subArray)
+    # parsing raw data
+    # (?) should look like that: 1,2,3;4,5,6;7,8,9[...]
+    try:
+        # si les données ont été envoyées en raw
+        rawData = request.data.decode('UTF-8')
+        if (len(rawData) > 0):
+            exploitableData = []
+            for data in rawData.split(';'):
+                subArray = []
+                for atomicData in data.split(','):
+                    subArray.append(atomicData)
+
+                exploitableData.append(subArray)
+
+        # sinon, elles ont été envoyées par Java's HTTP handler, et donc
+        # un couple clé/valeur
+        else:
+            rawData = request.args
+            return 'on était dans couple valeur lol'
+    
         
-        updateFireDatabase(exploitableData)
+        # updateFireDatabase(exploitableData)
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
