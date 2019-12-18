@@ -218,8 +218,6 @@ def API_FIRE_GET():
 def API_FIRE_SEND():
     rawData = 'no data'
 
-    return 'pute'
-
     # parsing raw data
     # (?) should look like that: 1,2,3;4,5,6;7,8,9[...]
     try:
