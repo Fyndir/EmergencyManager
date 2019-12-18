@@ -189,7 +189,6 @@ function addIdleMarker (coordinates, mymap)
 {
     // if it is already rendered, gtfo...
     let isItAlreadyBuffered = false;
-    // let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
     // for (let association of coordToFilenameMAP) {
     //     if (areDoubletEqual(coordinates, association.coord)) {
     //         isItAlreadyBuffered = true;
@@ -230,6 +229,9 @@ function addFireMarker (coordinates, intensity, mymap)
         fireGIF_filename = 'fire3.gif';
     }
 
+    // find location's name
+    let locationName = fromLatLongToName(coordinates);
+
     const fireIcon = L.icon({
         iconUrl: IMG_PATH + 'fire/' + fireGIF_filename,
         iconSize:     [60, 90], // size of the icon
@@ -238,6 +240,14 @@ function addFireMarker (coordinates, intensity, mymap)
     });
     let marker = L.marker(coordinates, {icon: fireIcon}).addTo(mymap);
     renderedMarkers.fireMarkers.markers.push(marker);
+
+    // add onclick popup
+    marker.bindPopup('<p class="popupLocationName">'+ locationName +'</p><h1 class="popupTitle">' + intensity + '</h1>', 
+    {
+        closeButton: false
+    });
+    marker.on('mouseover', e => { marker.openPopup(); });
+    marker.on('mouseout',  e => { marker.closePopup(); });
 }
 
 
@@ -319,6 +329,18 @@ function addMovingFiretruck (steps, duration, mymap)
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Returns the name of the location identified by its coordinates' array 'latLong' as [lat, long]
+function fromLatLongToName (latLong) {
+    for (let data of LyonGeogrpahicalData) {
+        if (areDoubletEqual(latLong, data.coord))
+            return data.name;
+    }
+    return 'no name';
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Fetches all the incendie data from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
 async function fetchAndDisplayIncendie (mymap) {
     fetch('/fire/get').then(r => r.json()).then(data => 
@@ -349,7 +371,7 @@ function updateIncendieData (newDataset, mymap)
     if (shouldClearMap) clearMap(mymap);
     for (let data of locationsCoordinates) {
         let coordinates = [data[0], data[1]];
-        let intensity = data[2] + 1;
+        let intensity = data[2] + 9;
         if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked)
             addFireMarker(coordinates, intensity, mymap)
         else
@@ -421,10 +443,6 @@ function rand(min, max){
 // the same file name associated to the doublet
 function latLongToFileName (latLong) 
 {
-    // this function returns true if doublet1 === doublet2, false sinon
-    // (?) gros, Javascript est pas capable de le faire tout seul. Alors, je le fais pour lui !
-    let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
-
     // en premier, on cherche si on n'a pas déjà associé un filename
     for (let association of coordToFilenameMAP) {
         if (areDoubletEqual(latLong, association.coord))
@@ -453,3 +471,10 @@ function latLongToFileName (latLong)
 
     return fileName;
 }
+
+
+// -----------------------------------------------------------------------------------------------------
+// @brief
+// this function returns true if doublet1 === doublet2, false sinon
+// (?) gros, Javascript est pas capable de le faire tout seul. Alors, je le fais pour lui !
+let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
