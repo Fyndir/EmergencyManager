@@ -18,6 +18,17 @@ INFLUXDB_CLIENT_URL = 'https://us-west-2-1.aws.cloud2.influxdata.com'
 BUCKET_ID = "Transversal"
 
 
+# ---------------------------------------------------------------------------------------------
+# @brief
+#  Returns True if 'stringo' is an integer or a float, Flase otherwise
+def isStringIntOrFloat(stringo):
+    if stringo.isdigit():
+        return True
+    if stringo.replace('.', '', 1).isdigit() and stringo.count('.') < 2:
+        return True
+    return False
+
+
 # -----------------------------------------------------------------------------------------
 # @brief
 #  Uh... Ok I don't know yet lolilol
@@ -74,7 +85,7 @@ def API_FIRE_SEND():
         for data in rawData.split(';'):
             subArray = []
             for atomicData in data.split(','):
-                if (len(atomicData) > 0 and atomicData.isnumeric()):
+                if len(atomicData) > 0 and isStringIntOrFloat(atomicData):
                     subArray.append(atomicData)
 
             # array integrity check
@@ -110,7 +121,7 @@ def API_CAMION_SEND():
         for data in rawData.split(';'):
             subArray = []
             for atomicData in data.split(','):
-                if (len(atomicData) > 0 and atomicData.isnumeric()):
+                if len(atomicData) > 0 and isStringIntOrFloat(atomicData):
                     subArray.append(atomicData)
 
             # array integrity check
