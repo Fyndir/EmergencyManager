@@ -17,6 +17,15 @@ let renderedMarkers = {
 };
 let renderedPolylines = [];
 
+// associe à un couple [lat,long] un filename. Voilà à quoi il ressemble
+// [
+//   {
+//      coord: [lat, long],
+//      filename: 'aaa.png'
+//   },
+// ]
+let coordToFilenameMAP = [];
+
 // --------------------------------------------------------------------------------------------------------------
 // @brief
 // This iz where de fun beginz
@@ -176,9 +185,11 @@ function fetchAndDisplayRoute (from, to, mymap)
 // @brief
 //  Adds an idle site marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 'coordinates'
 // argument, in the 'mymap' Leaflet map
-function addIdleMarker (coordinates, mymap) {
+function addIdleMarker (coordinates, mymap) 
+{
+    const fileName = latLongToFileName(coordinates);
     const idleMarkerIcon = L.icon({
-        iconUrl: IMG_PATH + `buildings/building(${rand(1,199)}).png`,
+        iconUrl: IMG_PATH + fileName,
         iconSize:     [40, 30], // size of the icon
         iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
@@ -378,4 +389,43 @@ function rand(min, max){
 	const _min = Math.ceil(min);
     const _max = Math.floor(max);
     return Math.floor(Math.random() * (_max - _min + 1)) + _min;
+}
+
+// -----------------------------------------------------------------------------------------------------
+// @brief
+//  Associates to the [latitude, longitude] 'latLong' array a unique file name to be able to alaways have
+// the same file name associated to the doublet
+function latLongToFileName (latLong) 
+{
+    // this function returns true if doublet1 === doublet2, false sinon
+    // (?) gros, Javascript est pas capable de le faire tout seul. Alors, je le fais pour lui !
+    let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
+
+    // en premier, on cherche si on n'a pas déjà associé un filename
+    for (let association of coordToFilenameMAP) {
+        if (areDoubletEqual(latLong, association.coord))
+            return association.filename;
+    }
+
+    // sinon, on l'associe.
+    let hassAssociated = false;
+    let filename;
+    while (!hassAssociated)
+    {
+        // build filename
+        const fileNumber = rand(1, 199);
+        fileName = `buildings/building(${fileNumber}).png`;
+
+        // check if filename already associated
+        hassAssociated = true;
+        for (let association of coordToFilenameMAP) {
+            if (association.fileName === latLong)
+                hassAssociated = false;
+                continue;
+        }
+
+        coordToFilenameMAP.push({ coord: latLong, filename: fileName});
+    }
+
+    return fileName;
 }
