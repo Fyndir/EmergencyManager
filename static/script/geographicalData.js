@@ -1,4 +1,5 @@
 
+// https://www.gps-coordinates.net/gps-coordinates-converter
 const LyonGeogrpahicalData = 
 [
     [45.750000, 4.850000], // Lyon
@@ -33,21 +34,33 @@ const LyonGeogrpahicalData =
     [45.7411111, 4.81833], // Confluences
     [45.760555, 4.833610], // Rue Spréafico
 
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
+    [45.760555, 4.933610], // Lacassagne
+    [45.736717, 4.797622], // Sainte-Foy-Lès-Lyon
+    [45.714667, 4.805411], // Oullins
+    [45.672140, 4.898802], // Corbas
+    [45.742787, 4.971591], // Chassieu
 
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
+    [45.697722, 4.886455], // Vénissieux
+    [45.763382, 4.880056], // Villeurbanne
+    [45.819565, 4.895625], // Rilleux la Pape
+    [45.806164, 4.750981], // Dardilly
+    [45.775522, 4.779369], // Ecully
 
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
-    [x, y],
+    [45.759875, 4.758326], // Tassin-La-Demi-Lune
+    [45.709712, 4.852633], // Saint-Fons
+    [45.664622, 4.958841], // Mions
+    [45.767062, 5.003037], // Meyzieu
+    [45.732561, 4.996642], // Genas
+
+    [45.695161, 4.791114], // Saint-Genis-laval
+    [45.670541, 4.856123], // Feyzin
+    [45.644941, 5.013143], // Saint-Pierre-De-Chandieu
+    [45.610372, 5.155515], // Villefontaine
+    [45.629422, 4.939229], // Chaponnay
+
+    [45.673341, 4.822045], // Irigny
+    [45.673979, 4.754071], // Brignais
+    [45.690291, 4.665733], // Quinsonnas
+    [45.810231, 4.596841], // Sain-Bel
+    [45.927921, 4.737495], // Ambérieux
 ]
