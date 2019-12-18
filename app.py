@@ -3,8 +3,8 @@ from multiprocessing import Array, Process, Value
 from collections import namedtuple
 from ctypes import c_char, c_wchar
 from flask_cors import CORS
+from DAL import *
 import threading
-import psycopg2
 import requests
 import time
 import json
@@ -43,158 +43,6 @@ def async_sendSimulationDataToIOT():
     # print(result)
 
 
-# -----------------------------------------------------------------------------------------
-# @brief
-#  Updates the fire database according to the new fire data 'allData'
-def updateFireDatabase(allData):
-    # PostegreSQL connection variables
-    POSTGRES_URL = "raja.db.elephantsql.com"
-    POSTGRES_PORT = "5432"
-    POSTGRES_USER = "cjczxqkt"
-    POSTGRES_PASSWORD = "VA69fv50J_3JHnNqEOLQ5r7bs1wPQPXS"
-    POSTGRES_DB_NAME = "cjczxqkt"
-
-    retVal = 'no data'
-    try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
-        cursor = connection.cursor()
-
-        # create query by extracting all atomic fields
-        query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES '
-        for dataArray in allData:
-            query += "(" + dataArray[0] + ", " + dataArray[1] + ", " + dataArray[2] + "),"
-        query = query[:-1] # remove last ','
-
-        print('here is the query')
-        print(query)
-
-        # cursor.execute(query)
-        # retVal = cursor.fetchall()
-
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while inserting data into PostgreSQL", error)
-
-    # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
-            connection.close()
-
-
-# -----------------------------------------------------------------------------------------
-# @brief
-#  Updates the firetruck database according to the new fire data 'allData'
-def updateFiretruckDatabase(allData):
-    # PostegreSQL connection variables
-    POSTGRES_URL = "raja.db.elephantsql.com"
-    POSTGRES_PORT = "5432"
-    POSTGRES_USER = "cjczxqkt"
-    POSTGRES_PASSWORD = "VA69fv50J_3JHnNqEOLQ5r7bs1wPQPXS"
-    POSTGRES_DB_NAME = "cjczxqkt"
-
-    retVal = 'no data'
-    try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
-        cursor = connection.cursor()
-
-        # create query by extracting all atomic fields
-        query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES '
-        for dataArray in allData:
-            query += "(" + dataArray[0] + ", " + dataArray[1] + ", " + dataArray[2] + "),"
-        query = query[:-1] # remove last ','
-
-        print('here is the query')
-        print(query)
-
-        # cursor.execute(query)
-        # retVal = cursor.fetchall()
-
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while inserting data into PostgreSQL", error)
-
-    # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
-            connection.close()
-
-
-# -----------------------------------------------------------------------------------------
-# @brief
-#  Fetches from the PostGreSQL database the fire positions and returns them
-def fetchFirePosition():
-    # PostegreSQL connection variables
-    POSTGRES_URL = "raja.db.elephantsql.com"
-    POSTGRES_PORT = "5432"
-    POSTGRES_USER = "cjczxqkt"
-    POSTGRES_PASSWORD = "VA69fv50J_3JHnNqEOLQ5r7bs1wPQPXS"
-    POSTGRES_DB_NAME = "cjczxqkt"
-
-    retVal = 'no data'
-    try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
-        cursor = connection.cursor()
-        cursor.execute("SELECT pos_x,pos_y,pos_i FROM v_pos")
-        retVal = cursor.fetchall()
-
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while fetching fire data from PostgreSQL", error)
-
-    # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
-            connection.close()
-
-    return retVal
-
-
-# -----------------------------------------------------------------------------------------
-# @brief
-#  Fetches from the PostGreSQL database the firetruck positions & ids and returns them
-def fetchFiretruckPosition():
-    # PostegreSQL connection variables
-    POSTGRES_URL = "raja.db.elephantsql.com"
-    POSTGRES_PORT = "5432"
-    POSTGRES_USER = "cjczxqkt"
-    POSTGRES_PASSWORD = "VA69fv50J_3JHnNqEOLQ5r7bs1wPQPXS"
-    POSTGRES_DB_NAME = "cjczxqkt"
-
-    retVal = 'no data'
-    try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
-        cursor = connection.cursor()
-        cursor.execute("SELECT camion_x,camion_y,immatriculation_camion FROM t_camion")
-        retVal = cursor.fetchall()
-
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while fetching firetruck data from PostgreSQL", error)
-
-    # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
-            connection.close()
-
-    return retVal
-
-
 # ---------------------------------------------------------------------------------
 #                                  WEBSITE USER ROUTING
 # ---------------------------------------------------------------------------------
@@ -218,28 +66,23 @@ def API_FIRE_GET():
 def API_FIRE_SEND():
     rawData = 'no data'
 
-    # parsing raw data
+    # parsing received data
     # (?) should look like that: 1,2,3;4,5,6;7,8,9[...]
     try:
-        # si les données ont été envoyées en raw
         rawData = request.data.decode('UTF-8')
-        if (len(rawData) > 0):
-            exploitableData = []
-            for data in rawData.split(';'):
-                subArray = []
-                for atomicData in data.split(','):
+        exploitableData = []
+        for data in rawData.split(';'):
+            subArray = []
+            for atomicData in data.split(','):
+                if (len(atomicData) > 0 and atomicData.isnumeric()):
                     subArray.append(atomicData)
 
+            # array integrity check
+            if (len(subArray) == 3):
                 exploitableData.append(subArray)
-
-        # sinon, elles ont été envoyées par Java's HTTP handler, et donc
-        # un couple clé/valeur
-        else:
-            rawData = request.args
-            return 'on était dans couple valeur lol'
-    
         
-        # updateFireDatabase(exploitableData)
+        for fireData in exploitableData:
+            updateFireDatabase(fireData)
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
@@ -253,24 +96,28 @@ def API_FIRE_SEND():
 # ---------------------------------------------------------------------------------
 @app.route('/camion/get')
 def API_CAMION_GET():
-    return 'salut g pa coder encore loul'
+    return jsonify(fetchFiretruckPosition())
 
 @app.route('/camion/send', methods=['POST'])
 def API_CAMION_SEND():
     rawData = 'no data'
+
+    # parsing received data
+    # (?) should look like that: lat1,long1;lat2,long2; [...]
     try:
-        # parsing raw data
-        # (?) should look like that: lat,long,id;lat,long,id
         rawData = request.data.decode('UTF-8')
         exploitableData = []
         for data in rawData.split(';'):
             subArray = []
             for atomicData in data.split(','):
-                subArray.append(atomicData)
+                if (len(atomicData) > 0 and atomicData.isnumeric()):
+                    subArray.append(atomicData)
 
-            exploitableData.append(subArray)
-
-        updateFireDatabase(exploitableData)
+            # array integrity check
+            if (len(subArray) == 3):
+                exploitableData.append(subArray)
+        
+        updateFiretruckDatabase(exploitableData)
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:

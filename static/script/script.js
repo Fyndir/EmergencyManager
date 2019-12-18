@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () =>
     locationsCoordinates = [];
 
     let mymap = setupLeaflet();
-    // fetchAndDisplayIncendie(mymap); // fetch first set of data
-    //async_gatherDataRegularly(5000, mymap);
+    fetchAndDisplayIncendie(mymap); // fetch first set of data
+    async_gatherDataRegularly(1000, mymap);
 });
 
 
@@ -136,9 +136,9 @@ function setupLeaflet ()
     mymap.addControl(new customControl_hideTruck);
 
     // test
-    const start = [45.54846, 4.84671];
-    const end = [45.94846, 4.84671];
-    fetchAndDisplayRoute(start, end, mymap);
+    // const start = [45.54846, 4.84671];
+    // const end = [45.94846, 4.84671];
+    // fetchAndDisplayRoute(start, end, mymap);
 
     return mymap;
 }
@@ -308,7 +308,7 @@ function addMovingFiretruck (steps, duration, mymap)
 // @brief
 //  Fetches all the incendie data from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
 async function fetchAndDisplayIncendie (mymap) {
-    fetch('http://127.0.0.1:5000/data').then(r => r.json()).then(data => 
+    fetch('http://127.0.0.1:5000/fire/get').then(r => r.json()).then(data => 
     {
         updateIncendieData(data, mymap)
     })
@@ -321,6 +321,7 @@ async function fetchAndDisplayIncendie (mymap) {
 //  In the Leaflet map 'mymap', updates all the displayed data with the new 'newDataset'
 function updateIncendieData (newDataset, mymap) 
 {
+    console.log(newDataset)
     // if no data is already set, render everything
     if (locationsCoordinates.length === 0)
         locationsCoordinates = newDataset;
@@ -329,15 +330,12 @@ function updateIncendieData (newDataset, mymap)
     locationsCoordinates = newDataset;
     clearMap(mymap);
     for (let data of locationsCoordinates) {
-        let coordinates = [data[0], data[1] * rand(2, 3)];
+        let coordinates = [data[0], data[1]];
         let intensity = data[2];
         if (intensity > 0)
             addFireMarker(coordinates, intensity, mymap)
         else
             addIdleMarker(coordinates, mymap)
-
-        const start = [45.54846, 4.84671];
-        addMovingFiretruck([start, coordinates], rand(20000, 30000), mymap);
     }
 }
 
