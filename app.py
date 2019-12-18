@@ -93,7 +93,7 @@ def API_FIRE_SEND():
                 exploitableData.append(subArray)
         
         for fireData in exploitableData:
-            updateFireDatabase(fireData)
+            insertIntoFireDatabase(fireData)
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:

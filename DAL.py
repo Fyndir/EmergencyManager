@@ -9,10 +9,9 @@ POSTGRES_DB_NAME = "cjczxqkt"
 
 # -----------------------------------------------------------------------------------------
 # @brief
-#  Updates the fire database according to the new fire data 'allData'
-def updateFireDatabase(allData):
+#  Inserts into the fire database the new fire data 'allData'
+def insertIntoFireDatabase(allData):
     retVal = 'no data'
-    print('> Updating fire database for the position [', allData[0], ', ', allData[1], ']')
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -25,13 +24,11 @@ def updateFireDatabase(allData):
         fireX = allData[0]
         fireY = allData[1]
         fireItensity = allData[2]
-        query = "UPDATE t_camion SET pos_i=" + fireItensity + " WHERE pos_x=" + fireY + " AND pos_y=" + fireY
-
-        print('here is the query')
-        print(query)
-
-        # cursor.execute(query)
-        # retVal = cursor.fetchall()
+        query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES '
+        for dataArray in allData:
+            query += "(" + fireX + ", " + fireY + ", " + fireItensity + "),"
+        query = query[:-1] # remove last ','
+        cursor.execute(query)
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while inserting data into PostgreSQL", error)
@@ -61,12 +58,8 @@ def updateFiretruckDatabase(allData):
         camionY = allData[1]
         camionImmat = allData[2]
         query = "UPDATE t_camion SET camion_x=" + camionX + ",camion_y=" + camionY + " WHERE immatriculation_camion=" + camionImmat
-
-        print('here is the query')
-        print(query)
-
-        # cursor.execute(query)
-        # retVal = cursor.fetchall()
+        cursor.execute(query)
+        retVal = cursor.fetchall()
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while inserting data into PostgreSQL", error)
