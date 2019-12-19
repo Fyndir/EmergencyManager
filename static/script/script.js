@@ -380,6 +380,7 @@ async function fetchAndDisplayIncendie (mymap) {
     // fetch('/fire/get').then(r => r.json()).then(data => 
     fetch('https://cpefiresimulation.azurewebsites.net/get').then(r => r.json()).then(data => 
     {
+        console.log(data)
         updateIncendieData(data, mymap)
     })
     .catch(e => { console.error(e) })
