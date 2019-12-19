@@ -76,6 +76,7 @@ def API_FIRE_GET():
 @app.route('/fire/test')
 def API_FIRE_TEST():
     insertIntoFireDatabase([45.75, 4.85, 1])
+    return 'coucou antoine'
 
 @app.route('/fire/send', methods=['POST'])
 def API_FIRE_SEND():
