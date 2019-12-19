@@ -248,7 +248,8 @@ function addFireMarker (coordinates, intensity, mymap)
     renderedMarkers.fireMarkers.markers.push(marker);
 
     // add onclick popup
-    marker.bindPopup('<p class="popupLocationName">'+ locationName +'</p><h1 class="popupTitle">' + intensity + '</h1>', 
+    // marker.bindPopup('<p class="popupLocationName">'+ locationName +'</p><h1 class="popupTitle">' + intensity + '</h1>', 
+    marker.bindPopup('<h1 class="popupTitle">' + intensity + '</h1>', 
     {
         closeButton: false
     });
@@ -380,7 +381,6 @@ async function fetchAndDisplayIncendie (mymap) {
     // fetch('/fire/get').then(r => r.json()).then(data => 
     fetch('https://cpefiresimulation.azurewebsites.net/get').then(r => r.json()).then(data => 
     {
-        console.log(data)
         updateIncendieData(data, mymap)
     })
     .catch(e => { console.error(e) })
@@ -443,8 +443,6 @@ function updateIncendieData (newDataset, mymap)
 //  In the Leaflet map 'mymap', updates all the displayed firetruck with the new 'newDataset'
 function updateFiretruckData (firetruckData, mymap) 
 {
-    console.log('updating firetruck...')
-    console.log(firetruckData)
     for (let data of firetruckData) {
         addFiretruckMarker([data[0], data[1]], mymap)
     }
