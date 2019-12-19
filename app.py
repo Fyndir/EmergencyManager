@@ -73,6 +73,10 @@ def root():
 def API_FIRE_GET():
     return jsonify(fetchFirePosition())
 
+@app.route('/fire/test')
+def API_FIRE_TEST():
+    insertIntoFireDatabase([45.75, 4.85, 1])
+
 @app.route('/fire/send', methods=['POST'])
 def API_FIRE_SEND():
     rawData = 'no data'
