@@ -378,8 +378,7 @@ async function fetchAndDisplayCaserne (mymap) {
 // @brief
 //  Fetches all the incendie data from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
 async function fetchAndDisplayIncendie (mymap) {
-    // fetch('/fire/get').then(r => r.json()).then(data => 
-    fetch('https://cpefiresimulation.azurewebsites.net/get').then(r => r.json()).then(data => 
+    fetch('/fire/get').then(r => r.json()).then(data => 
     {
         updateIncendieData(data, mymap)
     })
