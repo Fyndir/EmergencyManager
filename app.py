@@ -92,13 +92,10 @@ def API_FIRE_SEND():
             if (len(subArray) == 3):
                 exploitableData.append(subArray)
         
-        for fireData in exploitableData:
-            insertIntoFireDatabase(fireData)
+        insertIntoFireDatabase(exploitableData)
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
-        print('just got the fire data below')
-        print(rawData)
         return rawData
 
 
@@ -132,12 +129,47 @@ def API_CAMION_SEND():
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
-        print('just got the camion data below')
-        print(rawData)
         return rawData
 
 # start to send asynchronous data
 # async_sendSimulationDataToIOT()
+
+# -------------------------------------------------------------------------------------------------------
+# @brief
+#  Prend en entrée les données encryptées 'encryptedData' grâce à la méthode AES, et le sépare en
+# segments [ID _ DATA] de taille fixe 'segmentSize'
+# @note
+#  Pour obtenir des paquets d'une taille fixe de 60 octets, 'segmentSize' devrait valoir 11
+def splitPaquet(encryptedData, segmentSize):
+    hasFinishedSegmenting = False
+    hasReachedEndOfData = False
+    currentSegment = ''
+    segments = []
+    index = 0
+    while not hasFinishedSegmenting:
+        for x in range(0, segmentSize):
+            currentSegment += encryptedData[index]
+
+            if index >= len(encryptedData) - 1:
+                hasReachedEndOfData = True
+                break
+            else:
+                index += 1
+
+        # si on est arrivé à la fin et qu'il n'y a pas assez de char pour avoir la taille souhaitée,
+        # on rajoute des caractères bidons
+        if hasReachedEndOfData and len(currentSegment) < segmentSize:
+            for x in range(0, segmentSize - len(currentSegment)):
+                currentSegment += '*'
+
+        # arrivé ici, on a un segment de taille 'segmentSize'
+        segments.append(currentSegment)
+        currentSegment = '' # reset
+
+        if hasReachedEndOfData:
+            hasFinishedSegmenting = True
+
+splitPaquet('COUCOU LEO CA FAIT PLAISIR', 11)
     
 # main function, simply launching the server
 if __name__ == "__main__":
