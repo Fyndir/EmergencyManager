@@ -37,7 +37,7 @@ def insertIntoFireDatabase(allData):
         # cursor.execute(query)
 
     except (Exception, psycopg2.Error) as error :
-        print ("Error while inserting data into PostgreSQL", error)
+        raise NameError("Error while inserting data into PostgreSQL", error)
 
     # closing database connection.
     finally:
