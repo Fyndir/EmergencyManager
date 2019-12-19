@@ -371,7 +371,7 @@ function updateIncendieData (newDataset, mymap)
     if (shouldClearMap) clearMap(mymap);
     for (let data of locationsCoordinates) {
         let coordinates = [data[0], data[1]];
-        let intensity = data[2] + 9;
+        let intensity = data[2];
         if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked)
             addFireMarker(coordinates, intensity, mymap)
         else
@@ -396,7 +396,6 @@ function clearAllMarkers (mymap) {
         mymap.removeLayer(marker);
     }
     for (let marker of renderedMarkers.buildingMarkers.markers) {
-        console.log('clearing idle ')
         mymap.removeLayer(marker);
         mymap.removeLayer(marker);
     }
