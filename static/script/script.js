@@ -11,6 +11,10 @@ let renderedMarkers = {
         areShown: true,
         markers: []
     },
+    firestationMarkers: {
+        areShown: true,
+        markers: []
+    },
     truckMarkers: {
         areShown: true,
         markers: []
@@ -38,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () =>
     locationsCoordinates = [];
 
     let mymap = setupLeaflet();
+    console.log('fetching all')
+    fetchAndDisplayCaserne(mymap);
     fetchAndDisplayIncendie(mymap); // fetch first set of data
     async_gatherDataRegularly(1000, mymap);
 });
@@ -257,13 +263,29 @@ function addFireMarker (coordinates, intensity, mymap)
 // 'coordinates' argument, in the 'mymap' Leaflet map
 function addFirestationMarker (coordinates, mymap) {
     const firestationIcon = L.icon({
-        iconUrl: IMG_PATH + 'firestation.gif',
-        iconSize:     [60, 90], // size of the icon
+        iconUrl: IMG_PATH + 'firestation.jpg',
+        iconSize:     [80, 110], // size of the icon
         iconAnchor:   [30, 70], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-    let marker = L.marker(coordinates, {icon: firestation}).addTo(mymap);
-    renderedMarkers.buildingMarkers.markers.push(marker);
+    let marker = L.marker(coordinates, {icon: firestationIcon}).addTo(mymap);
+    renderedMarkers.firestationMarkers.markers.push(marker);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
+//  Adds a firetruck marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 
+// 'coordinates' argument, in the 'mymap' Leaflet map
+function addFiretruckMarker (coordinates, mymap) {
+    const firestationIcon = L.icon({
+        iconUrl: IMG_PATH + 'camion.gif',
+        iconSize:     [60, 47], // size of the icon
+        iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    let marker = L.marker(coordinates, {icon: firestationIcon}).addTo(mymap);
+    renderedMarkers.truckMarkers.markers.push(marker);
 }
 
 
@@ -341,6 +363,18 @@ function fromLatLongToName (latLong) {
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Fetches all the caserne positions from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
+async function fetchAndDisplayCaserne (mymap) {
+    fetch('/caserne/get').then(r => r.json()).then(data => 
+    {
+        displayCaserneData(data, mymap);
+    })
+    .catch(e => { console.error(e) })
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Fetches all the incendie data from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
 async function fetchAndDisplayIncendie (mymap) {
     fetch('/fire/get').then(r => r.json()).then(data => 
@@ -348,6 +382,28 @@ async function fetchAndDisplayIncendie (mymap) {
         updateIncendieData(data, mymap)
     })
     .catch(e => { console.error(e) })
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
+//  Fetches all the firetruck data from the PostgreSQL database and displays them inside the Leaflet map 'mymap'
+async function fetchAndDisplayCamion (mymap) {
+    fetch('/camion/get').then(r => r.json()).then(data => 
+    {
+        updateFiretruckData(data, mymap)
+    })
+    .catch(e => { console.error(e) })
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
+//  In the Leaflet map 'mymap', displays the casernes data with the positions contained in 'data'
+function displayCaserneData (caserneData, mymap) 
+{
+    for (let data of caserneData)
+        addFirestationMarker([data[0], data[1]], mymap);
 }
 
 
@@ -382,9 +438,24 @@ function updateIncendieData (newDataset, mymap)
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  In the Leaflet map 'mymap', updates all the displayed firetruck with the new 'newDataset'
+function updateFiretruckData (firetruckData, mymap) 
+{
+    console.log('updating firetruck...')
+    console.log(firetruckData)
+    for (let data of firetruckData)
+        addFiretruckMarker([data[0], data[1]], mymap)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Fetches incendie data every 'delay' milliseconds and processes it accordingly
 async function async_gatherDataRegularly (delay, mymap) {
-    setInterval(() => {fetchAndDisplayIncendie(mymap)}, delay)
+    setInterval(() => {
+        fetchAndDisplayIncendie(mymap);
+        fetchAndDisplayCamion(mymap);
+    }, delay)
 }
 
 

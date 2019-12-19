@@ -217,3 +217,17 @@ const LyonGeogrpahicalData =
         coord: [45.927921, 4.737495], // Ambérieux
     },
 ]
+
+
+// Casernes
+const LyonCasernePompier = 
+[
+    {
+        name: 'Pierre Corneille',
+        coord: [45.762785, 4.843926]
+    },
+    {
+        name: 'La Duchère',
+        coord: [45.7908, 4.79795]
+    },
+]

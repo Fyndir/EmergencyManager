@@ -18,25 +18,32 @@ def insertIntoFireDatabase(allData):
                                       host=POSTGRES_URL,
                                       port=POSTGRES_PORT,
                                       database=POSTGRES_DB_NAME)
-        connection.autocommit=True
+        connection.autocommit = True
         cursor = connection.cursor()
+        query = ''
+
+        # si on a envoyé juste un array
+        if not isinstance(allData[0], list):
+            fireX = allData[0]
+            fireY = allData[1]
+            fireItensity = allData[2]
+            query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+            cursor.execute(query)
 
         # create query by extracting all atomic fields
-        for dataArray in allData:
-            fireX = dataArray[0]
-            fireY = dataArray[1]
-            fireItensity = dataArray[2]
-            query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + fireX + ", " + fireY + ", " + fireItensity + ");"
-            print(query)
-            # query += "(" + fireX + ", " + fireY + ", " + fireItensity + "),"
-            cursor.execute("INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES (45.67054, 4.856123, 2);")
-            # cursor.commit()
-        # query = query[:-1] # remove last ','
+        else:
+            for dataArray in allData:
+                fireX = dataArray[0]
+                fireY = dataArray[1]
+                fireItensity = dataArray[2]
+                query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+                cursor.execute(query)
+            # query = query[:-1] # remove last ','
 
-        # print(query)
         # cursor.execute(query)
 
     except (Exception, psycopg2.Error) as error :
+        print('ERREUR')
         raise NameError("Error while inserting data into PostgreSQL", error)
 
     # closing database connection.
@@ -57,13 +64,14 @@ def updateFiretruckDatabase(allData):
                                       host=POSTGRES_URL,
                                       port=POSTGRES_PORT,
                                       database=POSTGRES_DB_NAME)
+        connection.autocommit = True
         cursor = connection.cursor()
 
         # create query by extracting all atomic fields
         camionX = allData[0]
         camionY = allData[1]
         camionImmat = allData[2]
-        query = "UPDATE t_camion SET camion_x=" + camionX + ",camion_y=" + camionY + " WHERE immatriculation_camion=" + camionImmat
+        query = "UPDATE t_camion SET camion_x=" + str(camionX) + ",camion_y=" + str(camionY) + " WHERE immatriculation_camion=" + str(camionImmat)
         cursor.execute(query)
         retVal = cursor.fetchall()
 
@@ -75,6 +83,33 @@ def updateFiretruckDatabase(allData):
         if(connection):
             cursor.close()
             connection.close()
+
+
+# -----------------------------------------------------------------------------------------
+# @brief
+#  Fetches from the PostGreSQL database the fire casernes positions and returns them
+def fetchCasernePosition():
+    retVal = 'no data'
+    try:
+        connection = psycopg2.connect(user=POSTGRES_USER,
+                                      password=POSTGRES_PASSWORD,
+                                      host=POSTGRES_URL,
+                                      port=POSTGRES_PORT,
+                                      database=POSTGRES_DB_NAME)
+        cursor = connection.cursor()
+        cursor.execute("SELECT caserne_x, caserne_y FROM t_caserne")
+        retVal = cursor.fetchall()
+
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while fetching caserne data from PostgreSQL", error)
+
+    # closing database connection.
+    finally:
+        if(connection):
+            cursor.close()
+            connection.close()
+
+    return retVal
 
 
 # -----------------------------------------------------------------------------------------

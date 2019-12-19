@@ -69,14 +69,18 @@ def root():
 # ---------------------------------------------------------------------------------
 #                             LOCALISATION API ENDPOINTS
 # ---------------------------------------------------------------------------------
+@app.route('/caserne/get')
+def API_CASERNE_GET():
+    return jsonify(fetchCasernePosition())
+
 @app.route('/fire/get')
 def API_FIRE_GET():
     return jsonify(fetchFirePosition())
 
-@app.route('/fire/test')
+@app.route('/fire/test', methods=['GET', 'POST'])
 def API_FIRE_TEST():
     try:
-        insertIntoFireDatabase([45.75, 4.85, 1])
+        insertIntoFireDatabase([[45.75, 4.85, 9], [45.75, 4.85, 3]])
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
