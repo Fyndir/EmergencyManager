@@ -1,5 +1,7 @@
 
 const IMG_PATH = '../img/';
+const SOUND_PATH = '../sounds/';
+
 let locationsCoordinates = [];
 let firetrucks = []; // contains all the firetrucks data, such as current position, next position...
 let renderedMarkers = {
@@ -169,6 +171,10 @@ function addCPEMarker (mymap) {
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker([45.78155, 4.868178], {icon: CPEIcon}).addTo(mymap);
+    marker.on('click', e => {
+        console.log('> add -7000e over the liasse de billets')
+        new Audio(SOUND_PATH + 'money.mp3').play();
+    });
 }
 
 
