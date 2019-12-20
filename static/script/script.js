@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () =>
     locationsCoordinates = [];
 
     let mymap = setupLeaflet();
+    addCPEMarker(mymap);
     fetchAndDisplayCaserne(mymap);
     fetchAndDisplayCamion(mymap);
     fetchAndDisplayIncendie(mymap); // fetch first set of data
@@ -159,6 +160,20 @@ function swapLatLong (array) { return [array[1], array[0]] }
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Adds a custom marker in the Leaflet map 'mymap' identifying the amazing CPE engeneering school
+function addCPEMarker (mymap) {
+    const CPEIcon = L.icon({
+        iconUrl: IMG_PATH + 'money.gif',
+        iconSize:     [40, 30], // size of the icon
+        iconAnchor:   [20, 22], // point of the icon which will correspond to marker's location
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    let marker = L.marker([45.78155, 4.868178], {icon: CPEIcon}).addTo(mymap);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Fetches the route computed by the OSRM online and free engine and displays it on the leaflet map 'mymap'
 // @note
 //  The 'from' and 'to' variables are arrays containing latitude and longitude data
@@ -228,13 +243,20 @@ function addIdleMarker (coordinates, mymap)
 function addFireMarker (coordinates, intensity, mymap) 
 {
     let fireGIF_filename = 'fire1.gif'; // default value
-    if (intensity >= 1 && intensity < 3) {
+    if (intensity === 1)
         fireGIF_filename = 'fire1.gif';
-    } else if (intensity >= 4 && intensity < 7) {
-        fireGIF_filename = 'fire2.gif';
-    } else {
+    if (intensity === 2)
+        fireGIF_filename = 'fire4.gif';
+    if (intensity === 3)
+        fireGIF_filename = 'fire7.gif';
+    if (intensity === 4)
         fireGIF_filename = 'fire3.gif';
-    }
+    if (intensity === 5)
+        fireGIF_filename = 'fire2.gif';
+    if (intensity === 6)
+        fireGIF_filename = 'fire5.gif';
+    if (intensity >= 7)
+        fireGIF_filename = 'fire6.gif';
 
     // find location's name
     let locationName = fromLatLongToName(coordinates);
