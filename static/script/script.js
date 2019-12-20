@@ -2,6 +2,15 @@
 const IMG_PATH = '../img/';
 const SOUND_PATH = '../sounds/';
 
+let bufferedAudio = {
+    cashMoney: new Audio(SOUND_PATH + 'money.mp3'),
+    crowdScream1: new Audio(SOUND_PATH + 'crowd/crowd1.wav'),
+    crowdScream2: new Audio(SOUND_PATH + 'crowd/crowd2.wav'),
+    crowdScream3: new Audio(SOUND_PATH + 'crowd/crowd3.wav'),
+    extinguish: new Audio(SOUND_PATH + 'extinguish.wav'),
+    boom: new Audio(SOUND_PATH + 'boom.wav'),
+}
+
 // this array is filled with all the fire [lat,long] for which we have already popped ze petits bonhommes
 let triggeredFirePetitBonhomme = [];
 
@@ -186,7 +195,7 @@ function addCPEMarker (mymap) {
     let marker = L.marker([45.78155, 4.868178], {icon: CPEIcon}).addTo(mymap);
     marker.on('click', e => {
         console.log('> add -7000e over the liasse de billets')
-        new Audio(SOUND_PATH + 'money.mp3').play();
+        bufferedAudio.cashMoney.play();
     });
 }
 
@@ -506,13 +515,14 @@ function updateIncendieData (newDataset, mymap)
 
         const wasFireLitBefore = renderedMarkers.fireMarkers.litFires.find(e => areDoubletEqual(e, coordinates)) != undefined;
         const fumeeSeteintTelle = laFumeeEstEnTrainDeSeteindre.find(e => areDoubletEqual(e, coordinates)) != undefined;
-        if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked) {
+        if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked) 
+        {
             addFireMarker(coordinates, intensity, mymap)
 
             // ajout d'un petit bonhomme si pas déjà fait 1 fois
             const havePetitBonhommeBeenTriggered = triggeredFirePetitBonhomme.find(e => areDoubletEqual(e, coordinates)) != undefined;
-            if (!havePetitBonhommeBeenTriggered) {
-
+            if (!havePetitBonhommeBeenTriggered) 
+            {
                 const NB_PETIT_BONHOMME = 10;
                 for (let i = 0 ; i < NB_PETIT_BONHOMME ; i++) {
                     const destinationOfPetitBonhomme_lat = coordinates[0] + rand_float(-.0115, .0115, 8);
@@ -526,19 +536,42 @@ function updateIncendieData (newDataset, mymap)
 
                 // on se souviendra de pas les redessiner à chaque refresh !
                 triggeredFirePetitBonhomme.push(coordinates);
+
+                // boom + scream !!
+                try { 
+                    let whichScream = rand(1, 3);
+                    if (whichScream == 1)
+                        bufferedAudio.crowdScream1.play();
+                    else if (whichScream == 2)
+                        bufferedAudio.crowdScream2.play();
+                    else
+                        bufferedAudio.crowdScream3.play();
+
+                    bufferedAudio.boom.play();
+                } catch (e) {
+                    console.error(e)
+                }
             }
         }
 
         // if the fire is now of intensity 0 and was lit before
         else if (intensity === 0 && wasFireLitBefore) {
-            console.log('the fire was lit before and now show the smoke')
-
             // remove current coordinates from litFires[]
-            const arrayTronquey = [];
+            let arrayTronquey = [];
             for (let data of renderedMarkers.fireMarkers.litFires)
                 if (!areDoubletEqual(data, coordinates))
                     arrayTronquey.push(data)
             renderedMarkers.fireMarkers.litFires = arrayTronquey
+
+            // reset petit bonhomme for this location
+            arrayTronquey = [];
+            for (let data of triggeredFirePetitBonhomme)
+                if (!areDoubletEqual(data, coordinates))
+                    arrayTronquey.push(data)
+            triggeredFirePetitBonhomme = arrayTronquey
+
+            // extinguish sa mère
+            bufferedAudio.extinguish.play();
 
             laFumeeEstEnTrainDeSeteindre.push(coordinates);
             addSmokeMarker(coordinates, mymap);
