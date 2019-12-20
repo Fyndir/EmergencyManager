@@ -2,6 +2,9 @@
 const IMG_PATH = '../img/';
 const SOUND_PATH = '../sounds/';
 
+// this array is filled with all the fire [lat,long] for which we have already popped ze petits bonhommes
+let triggeredFirePetitBonhomme = [];
+
 let locationsCoordinates = [];
 let firetrucks = []; // contains all the firetrucks data, such as current position, next position...
 let renderedMarkers = {
@@ -20,6 +23,9 @@ let renderedMarkers = {
     },
     truckMarkers: {
         areShown: true,
+        markers: []
+    },
+    petitBonhommeMarkers: {
         markers: []
     }
 };
@@ -62,7 +68,7 @@ function setupLeaflet ()
 {
     var mymap = L.map('leafletMap').setView(
         [45.74846, 4.84671], // Lyon's geographical coordinates
-        11 // zoom level
+        13 // zoom level
     );
 
     const accessToken = 'pk.eyJ1IjoiY291Y291aWxsZSIsImEiOiJjazNvZzhmdnUxbGFkM2tvN2FyZ2t4NjZiIn0.0RGUwtF2X-i72qCEeb_G0w';
@@ -456,14 +462,36 @@ function updateIncendieData (newDataset, mymap)
     // render everything
     locationsCoordinates = newDataset;
     if (shouldClearMap) clearMap(mymap);
-    for (let data of locationsCoordinates) {
-        let coordinates = [data[0], data[1]];
-        let intensity = data[2];
-        if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked)
+    for (const data of locationsCoordinates) {
+        const coordinates = [data[0], data[1]];
+        const intensity = data[2];
+        if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked) {
             addFireMarker(coordinates, intensity, mymap)
+
+            // ajout d'un petit bonhomme si pas déjà fait 1 fois
+            const havePetitBonhommeBeenTriggered = triggeredFirePetitBonhomme.find(e => areDoubletEqual(e, coordinates)) != undefined;
+            if (!havePetitBonhommeBeenTriggered) {
+
+                const NB_PETIT_BONHOMME = 10;
+                for (let i = 0 ; i < NB_PETIT_BONHOMME ; i++) {
+                    const destinationOfPetitBonhomme_lat = coordinates[0] + rand_float(-.0115, .0115, 8);
+                    const destinationOfPetitBonhomme_long = coordinates[1] + rand_float(-.0115, .0115, 8);
+                    createAndDisplayPetitBonhomme(
+                        [
+                            coordinates, // from
+                            [destinationOfPetitBonhomme_lat, destinationOfPetitBonhomme_long], // to
+                        ], mymap);
+                }
+
+                // on se souviendra de pas les redessiner à chaque refresh !
+                triggeredFirePetitBonhomme.push(coordinates);
+            }
+        }
         else
             addIdleMarker(coordinates, mymap)
     }
+
+    console.log(triggeredFirePetitBonhomme.length + ' petit bohommes lancés !')
 }
 
 
@@ -562,6 +590,16 @@ function clearAllPolylines (mymap) {
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Clears all the petitBonhommes rendered in the Leaflet map 'mymap'
+function clearAllPetitBonhomme (mymap) {
+    for (let pb of renderedMarkers.petitBonhommeMarkers.markers) {
+        mymap.removeLayer(pb);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Clears everything from the Leaflet map 'mymap' except the map tiles
 function clearMap (mymap) {
     clearAllMarkers(mymap);
@@ -576,6 +614,15 @@ function rand(min, max){
 	const _min = Math.ceil(min);
     const _max = Math.floor(max);
     return Math.floor(Math.random() * (_max - _min + 1)) + _min;
+}
+
+
+// -------------------------------------------------------------------------------------------------------
+// @brief
+//  Retourne un nombre aléatoire entre 'min' et 'max', avec 'precision' décimales
+// 
+function rand_float(min, max, precision = 2) {
+    return parseFloat((Math.random() * (max - min) + min).toFixed(precision));
 }
 
 // -----------------------------------------------------------------------------------------------------
@@ -611,6 +658,41 @@ function latLongToFileName (latLong)
     }
 
     return fileName;
+}
+
+
+// -----------------------------------------------------------------------------------------------------
+// @brief
+//  Ajoute un petit bonhomme (cad un marker Leaflet) qui court de la position 'from' à la position 'to',
+// et tout cela dans la map Leaflet 'mymap'
+function createAndDisplayPetitBonhomme (steps, mymap) {
+    const petitBonhommeFileNumber = rand(1, 1);
+    const petitBonhommeIcon = L.icon({
+        iconUrl: IMG_PATH + `petitBonhomme${petitBonhommeFileNumber}.png`,
+        iconSize:     [40, 25], // size of the icon
+        iconAnchor:   [20, 20], // point of the icon which will correspond to marker's location
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    // déplace le petit bonhomme de 'from' à 'to'
+    const pathToFollow = [...steps];
+    let petitBonhomme = L.Marker.movingMarker(
+        pathToFollow, 
+        6000, 
+        { 
+            autostart: true,
+            icon: petitBonhommeIcon
+        }
+    );
+
+    // on arrival tu coco
+    petitBonhomme.addEventListener('end', () => {
+        mymap.removeLayer(petitBonhomme);
+    })
+
+    mymap.addLayer(petitBonhomme);
+    petitBonhomme.start();
+    renderedMarkers.petitBonhommeMarkers.markers.push(petitBonhomme);
 }
 
 
