@@ -9,6 +9,7 @@ let bufferedAudio = {
     crowdScream3: new Audio(SOUND_PATH + 'crowd/crowd3.wav'),
     extinguish: new Audio(SOUND_PATH + 'extinguish.wav'),
     boom: new Audio(SOUND_PATH + 'boom.wav'),
+    waw: new Audio(SOUND_PATH + 'waw.mp3'),
 }
 
 // this array is filled with all the fire [lat,long] for which we have already popped ze petits bonhommes
@@ -257,7 +258,8 @@ function addSmokeMarker (coordinates, mymap)
 
         mymap.removeLayer(marker);
         addIdleMarker(coordinates, mymap);
-    }, 4000);
+        bufferedAudio.waw.play();
+    }, 3000);
 }
 
 
@@ -523,7 +525,7 @@ function updateIncendieData (newDataset, mymap)
             const havePetitBonhommeBeenTriggered = triggeredFirePetitBonhomme.find(e => areDoubletEqual(e, coordinates)) != undefined;
             if (!havePetitBonhommeBeenTriggered) 
             {
-                const NB_PETIT_BONHOMME = 10;
+                const NB_PETIT_BONHOMME = 50;
                 for (let i = 0 ; i < NB_PETIT_BONHOMME ; i++) {
                     const destinationOfPetitBonhomme_lat = coordinates[0] + rand_float(-.0115, .0115, 8);
                     const destinationOfPetitBonhomme_long = coordinates[1] + rand_float(-.0115, .0115, 8);
@@ -786,7 +788,7 @@ function createAndDisplayPetitBonhomme (steps, mymap) {
 
     // on arrival tu coco
     petitBonhomme.addEventListener('end', () => {
-        mymap.removeLayer(petitBonhomme);
+        mymap.removeLayer(petitBonhomme)
     })
 
     mymap.addLayer(petitBonhomme);
