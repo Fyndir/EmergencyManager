@@ -788,7 +788,10 @@ function createAndDisplayPetitBonhomme (steps, mymap) {
 
     // on arrival tu coco
     petitBonhomme.addEventListener('end', () => {
-        mymap.removeLayer(petitBonhomme)
+        const delay = rand(0, 1000);
+        setTimeout(() => {
+            mymap.removeLayer(petitBonhomme);
+        }, delay);
     })
 
     mymap.addLayer(petitBonhomme);
