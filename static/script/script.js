@@ -1,6 +1,7 @@
 
 const IMG_PATH = '../img/';
 let locationsCoordinates = [];
+let firetrucks = []; // contains all the firetrucks data, such as current position, next position...
 let renderedMarkers = {
     fireMarkers: {
         areShown: true,
@@ -42,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () =>
     locationsCoordinates = [];
 
     let mymap = setupLeaflet();
-    console.log('fetching all')
     fetchAndDisplayCaserne(mymap);
+    fetchAndDisplayCamion(mymap);
     fetchAndDisplayIncendie(mymap); // fetch first set of data
     async_gatherDataRegularly(1000, mymap);
 });
@@ -129,11 +130,11 @@ function setupLeaflet ()
             container.onclick = function(){
                 const areMarkersShown = renderedMarkers.truckMarkers.areShown;
                 renderedMarkers.truckMarkers.areShown = !areMarkersShown;
-                for (let marker of renderedMarkers.truckMarkers.markers) {
+                for (let markerContainer of renderedMarkers.truckMarkers.markers) {
                     if (areMarkersShown)
-                        mymap.removeLayer(marker);
+                        mymap.removeLayer(markerContainer.marker);
                     else
-                        mymap.addLayer(marker);
+                        mymap.addLayer(markerContainer.marker);
                 }
             }
             return container;
@@ -278,7 +279,7 @@ function addFirestationMarker (coordinates, mymap) {
 // @brief
 //  Adds a firetruck marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 
 // 'coordinates' argument, in the 'mymap' Leaflet map
-function addFiretruckMarker (coordinates, mymap) {
+function addFiretruckMarker (coordinates, immatriculation, mymap) {
     const firestationIcon = L.icon({
         iconUrl: IMG_PATH + 'camion.gif',
         iconSize:     [60, 47], // size of the icon
@@ -286,7 +287,8 @@ function addFiretruckMarker (coordinates, mymap) {
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: firestationIcon}).addTo(mymap);
-    renderedMarkers.truckMarkers.markers.push(marker);
+    marker.setZIndexOffset(1000);
+    renderedMarkers.truckMarkers.markers.push({immatriculation, marker});
 }
 
 
@@ -442,8 +444,48 @@ function updateIncendieData (newDataset, mymap)
 //  In the Leaflet map 'mymap', updates all the displayed firetruck with the new 'newDataset'
 function updateFiretruckData (firetruckData, mymap) 
 {
-    for (let data of firetruckData) {
-        addFiretruckMarker([data[0], data[1]], mymap)
+    for (let data of firetruckData) 
+    {
+        const dataCurrentCoord = [data[0], data[1]];
+        const dataDestinationCoord = [data[2], data[3]]; // never changes
+        const dataImmatriculation = data[4];
+
+        // buffer firetruck if not already
+        let bufferedFiretruck = firetrucks.find(e => areDoubletEqual(e.immatriculation, dataImmatriculation));
+        if (bufferedFiretruck == undefined) {
+            firetrucks.push({
+                immatriculation: dataImmatriculation,
+                originCoord: dataCurrentCoord,
+                currentCoord: dataCurrentCoord,
+                futureCoord: undefined
+            })
+            console.log('buffered a firetruck')
+            addFiretruckMarker(dataCurrentCoord, dataImmatriculation, mymap);
+        }
+
+        // finding the marker and updating its position
+        let markerContainer = renderedMarkers.truckMarkers.markers.find(e => e.immatriculation = dataImmatriculation);
+        if (markerContainer != undefined) {
+            markerContainer.marker.setLatLng([dataCurrentCoord[0], dataCurrentCoord[1]]);
+        }
+
+        // else, update the buffered firetruck
+        /*
+        else {
+            const hasFiretruckToMoveFromOrigin = !areDoubletEqual(bufferedFiretruck.originCoord, dataCurrentCoord) && bufferedFiretruck.futureCoord == undefined;
+            const hasFiretruckToMoveFromCurrent = bufferedFiretruck.currentCoord != undefined  && !areDoubletEqual(bufferedFiretruck.currentCoord, dataCurrentCoord);
+            if (hasFiretruckToMoveFromOrigin) {
+                console.log('need to move from origin');
+                bufferedFiretruck.currentCoord = bufferedFiretruck.originCoord;
+                bufferedFiretruck.futureCoord = dataCurrentCoord;
+            }
+            else if (hasFiretruckToMoveFromCurrent) {
+                console.log('need to move from current');
+                bufferedFiretruck.futureCoord = dataCurrentCoord;
+            }
+        }*/
+
+        // addFiretruckMarker(dataCurrentCoord, mymap);
     }
 }
 
@@ -471,11 +513,12 @@ function clearAllMarkers (mymap) {
         mymap.removeLayer(marker);
     }
     for (let marker of renderedMarkers.truckMarkers.markers) {
-        mymap.removeLayer(marker);
+        // mymap.removeLayer(marker);
     }
 
     renderedMarkers.fireMarkers.markers = [];
     renderedMarkers.buildingMarkers.markers = [];
+    // renderedMarkers.truckMarkers.markers = [];
 }
 
 

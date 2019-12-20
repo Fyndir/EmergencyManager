@@ -32,11 +32,14 @@ def insertIntoFireDatabase(allData):
 
         # create query by extracting all atomic fields
         else:
+            print('getting this array to INSERT INTO')
+            print(allData)
             for dataArray in allData:
                 fireX = dataArray[0]
                 fireY = dataArray[1]
                 fireItensity = dataArray[2]
                 query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+                print(query)
                 cursor.execute(query)
             # query = query[:-1] # remove last ','
 
