@@ -5,13 +5,17 @@ const SOUND_PATH = '../sounds/';
 // this array is filled with all the fire [lat,long] for which we have already popped ze petits bonhommes
 let triggeredFirePetitBonhomme = [];
 
+// contains all the [lat, long] in which there is fumée qui est en train de s'éteindre
+let laFumeeEstEnTrainDeSeteindre = []; 
+
 let locationsCoordinates = [];
 let firetrucks = []; // contains all the firetrucks data, such as current position, next position...
 let renderedMarkers = {
     fireMarkers: {
         areShown: true,
         isLocked: false, // if is locked, you can't add to it -> used by the fire marker filter
-        markers: []
+        markers: [],
+        litFires: [] // contains the [lat, long] of all lit fires on the ma
     },
     buildingMarkers: {
         areShown: true,
@@ -26,6 +30,9 @@ let renderedMarkers = {
         markers: []
     },
     petitBonhommeMarkers: {
+        markers: []
+    },
+    smokeMarkers: {
         markers: []
     }
 };
@@ -217,6 +224,36 @@ function fetchAndDisplayRoute (from, to, mymap)
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Adds smoke marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 'coordinates'
+// argument, in the 'mymap' Leaflet map
+function addSmokeMarker (coordinates, mymap) 
+{
+    const smokeIcon = L.icon({
+        iconUrl: IMG_PATH + 'smoke.gif',
+        iconSize:     [200, 200], // size of the icon
+        iconAnchor:   [98, 175], // point of the icon which will correspond to marker's location
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    let marker = L.marker(coordinates, {icon: smokeIcon}).addTo(mymap);
+    renderedMarkers.smokeMarkers.markers.push(marker);
+
+    // éteindre la fumée au bout d'un certain temps, et faire réapparaître le batîment
+    setTimeout(() => {
+
+        const arrayTronquey = [];
+        for (let data of laFumeeEstEnTrainDeSeteindre)
+            if (!areDoubletEqual(data, coordinates))
+                arrayTronquey.push(data)
+        laFumeeEstEnTrainDeSeteindre = arrayTronquey
+
+        mymap.removeLayer(marker);
+        addIdleMarker(coordinates, mymap);
+    }, 4000);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Adds an idle site marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 'coordinates'
 // argument, in the 'mymap' Leaflet map
 function addIdleMarker (coordinates, mymap) 
@@ -281,6 +318,7 @@ function addFireMarker (coordinates, intensity, mymap)
     });
     let marker = L.marker(coordinates, {icon: fireIcon}).addTo(mymap);
     renderedMarkers.fireMarkers.markers.push(marker);
+    renderedMarkers.fireMarkers.litFires.push(coordinates);
 
     // add onclick popup
     // marker.bindPopup('<p class="popupLocationName">'+ locationName +'</p><h1 class="popupTitle">' + intensity + '</h1>', 
@@ -465,6 +503,9 @@ function updateIncendieData (newDataset, mymap)
     for (const data of locationsCoordinates) {
         const coordinates = [data[0], data[1]];
         const intensity = data[2];
+
+        const wasFireLitBefore = renderedMarkers.fireMarkers.litFires.find(e => areDoubletEqual(e, coordinates)) != undefined;
+        const fumeeSeteintTelle = laFumeeEstEnTrainDeSeteindre.find(e => areDoubletEqual(e, coordinates)) != undefined;
         if (intensity > 0 && !renderedMarkers.fireMarkers.isLocked) {
             addFireMarker(coordinates, intensity, mymap)
 
@@ -487,11 +528,26 @@ function updateIncendieData (newDataset, mymap)
                 triggeredFirePetitBonhomme.push(coordinates);
             }
         }
-        else
-            addIdleMarker(coordinates, mymap)
-    }
 
-    console.log(triggeredFirePetitBonhomme.length + ' petit bohommes lancés !')
+        // if the fire is now of intensity 0 and was lit before
+        else if (intensity === 0 && wasFireLitBefore) {
+            console.log('the fire was lit before and now show the smoke')
+
+            // remove current coordinates from litFires[]
+            const arrayTronquey = [];
+            for (let data of renderedMarkers.fireMarkers.litFires)
+                if (!areDoubletEqual(data, coordinates))
+                    arrayTronquey.push(data)
+            renderedMarkers.fireMarkers.litFires = arrayTronquey
+
+            laFumeeEstEnTrainDeSeteindre.push(coordinates);
+            addSmokeMarker(coordinates, mymap);
+        }
+
+        else if (!fumeeSeteintTelle) {
+            addIdleMarker(coordinates, mymap)
+        }
+    }
 }
 
 
@@ -594,6 +650,16 @@ function clearAllPolylines (mymap) {
 function clearAllPetitBonhomme (mymap) {
     for (let pb of renderedMarkers.petitBonhommeMarkers.markers) {
         mymap.removeLayer(pb);
+    }
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
+//  Clears all the smoke markers rendered in the Leaflet map 'mymap'
+function clearAllSmoke (mymap) {
+    for (let somke of renderedMarkers.smokeMarkers.markers) {
+        mymap.removeLayer(smoke);
     }
 }
 
