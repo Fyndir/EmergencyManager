@@ -33,6 +33,6 @@ Son role est d'inserer les données qu'il recoit dans la base de données à l'a
 
 Son role est de stocker les données des feux et d'affecté les camions au dit feux à l'aide d'un ensemble de trigger SQL
 
-## EmergencyManager
+## Le serveur Emergency Manager
 
 ### Fonctionnement
