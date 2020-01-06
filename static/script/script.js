@@ -285,11 +285,15 @@ function addIdleMarker (coordinates, mymap)
         iconAnchor:   [20, 22], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-    let marker = L.marker(coordinates, {icon: idleMarkerIcon}).addTo(mymap);
-    // marker._icon.classList.add('leaflet_idleMarker');
-    renderedMarkers.buildingMarkers.markers.push(marker);
 
-    if (!isItAlreadyBuffered) { }
+    try {
+        let marker = L.marker(coordinates, {icon: idleMarkerIcon}).addTo(mymap);
+        // marker._icon.classList.add('leaflet_idleMarker');
+        renderedMarkers.buildingMarkers.markers.push(marker);
+
+        if (!isItAlreadyBuffered) { }
+
+    } catch (e) { }
 }
 
 
@@ -453,6 +457,9 @@ function fromLatLongToName (latLong) {
 async function fetchAndDisplayCaserne (mymap) {
     fetch('/caserne/get').then(r => r.json()).then(data => 
     {
+        if (data == 'no data')
+            return;
+
         displayCaserneData(data, mymap);
     })
     .catch(e => { console.error(e) })
@@ -465,6 +472,9 @@ async function fetchAndDisplayCaserne (mymap) {
 async function fetchAndDisplayIncendie (mymap) {
     fetch('/fire/get').then(r => r.json()).then(data => 
     {
+        if (data == 'no data')
+            return;
+
         updateIncendieData(data, mymap)
     })
     .catch(e => { console.error(e) })
@@ -477,10 +487,10 @@ async function fetchAndDisplayIncendie (mymap) {
 async function fetchAndDisplayCamion (mymap) {
     fetch('/camion/get').then(r => r.json()).then(data => 
     {
-        try {
-            const isDataExploitable = JSON.parse(data);
-            updateFiretruckData(data, mymap)
-        } catch (e) { }
+        if (data == 'no data')
+            return;
+
+        updateFiretruckData(data, mymap)
     })
     .catch(e => { console.error(e) })
 }
@@ -805,6 +815,14 @@ function createAndDisplayPetitBonhomme (steps, mymap) {
 
 // -----------------------------------------------------------------------------------------------------
 // @brief
+//  Pretty straightforward B O I
+function isNotNullNorUndefined (variable) { 
+	return variable !== null && typeof variable !== 'undefined'; 
+}
+
+
+// -----------------------------------------------------------------------------------------------------
+// @brief
 // this function returns true if doublet1 === doublet2, false sinon
 // (?) gros, Javascript est pas capable de le faire tout seul. Alors, je le fais pour lui !
-let areDoubletEqual = (doublet1, doublet2) => { return doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
+let areDoubletEqual = (doublet1, doublet2) => { return isNotNullNorUndefined(doublet1) && isNotNullNorUndefined(doublet2) && doublet1[0] === doublet2[0] && doublet1[1] === doublet2[1] }
