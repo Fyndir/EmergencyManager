@@ -88,7 +88,7 @@ def updateFiretruckDatabase(allData):
             camionX = triplet[0]
             camionY = triplet[1]
             camionImmat = triplet[2]
-            query = "UPDATE t_camion SET camion_x=" + str(camionX) + ",camion_y=" + str(camionY) + " WHERE immatriculation_camion='" + str(camionImmat) + "'"
+            query = 'UPDATE t_camion SET camion_x=' + str(camionX) + ',camion_y=' + str(camionY) + ' WHERE immatriculation_camion="' + str(camionImmat) + '"'
             print('\n', query, '\n')
             cursor.execute(query)
             retVal = cursor.fetchall()
