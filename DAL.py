@@ -166,4 +166,7 @@ def fetchFiretruckPosition():
             cursor.close()
             connection.close()
 
-    return retVal
+    if len(retVal) == 0:
+        return 'no data'
+    else:
+        return retVal
