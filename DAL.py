@@ -14,6 +14,11 @@ def insertIntoFireDatabase(allData):
     retVal = 'no data'
     connection = None
     cursor = None
+
+    # si on n'a rien envoyé, abort
+    if len(allData) == 0:
+        return
+
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -65,6 +70,11 @@ def updateFiretruckDatabase(allData):
     retVal = 'no data'
     connection = None
     cursor = None
+
+    # si on n'a rien envoyé, abort
+    if len(allData) == 0:
+        return
+
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,

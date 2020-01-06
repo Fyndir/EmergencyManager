@@ -477,7 +477,10 @@ async function fetchAndDisplayIncendie (mymap) {
 async function fetchAndDisplayCamion (mymap) {
     fetch('/camion/get').then(r => r.json()).then(data => 
     {
-        updateFiretruckData(data, mymap)
+        try {
+            const isDataExploitable = JSON.parse(data);
+            updateFiretruckData(data, mymap)
+        } catch (e) { }
     })
     .catch(e => { console.error(e) })
 }
