@@ -53,7 +53,6 @@ def insertIntoFireDatabase(allData):
 
     except (Exception, psycopg2.Error) as error :
         raise NameError("Error while inserting data into PostgreSQL", error)
-        insertIntoFireDatabase(allData)
 
     # closing database connection.
     finally:
@@ -95,7 +94,6 @@ def updateFiretruckDatabase(allData):
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while inserting firetruck data into PostgreSQL: ", error)
-        updateFiretruckDatabase(allData)
 
     # closing database connection.
     finally:
@@ -123,7 +121,6 @@ def fetchCasernePosition():
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while fetching caserne data from PostgreSQL", error)
-        fetchCasernePosition()
 
     # closing database connection.
     finally:
@@ -153,7 +150,6 @@ def fetchFirePosition():
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while fetching fire data from PostgreSQL", error)
-        fetchFirePosition()
 
     # closing database connection.
     finally:
@@ -183,7 +179,6 @@ def fetchFiretruckPosition():
 
     except (Exception, psycopg2.Error) as error :
         print ("Error while fetching firetruck data from PostgreSQL", error)
-        fetchFiretruckPosition()
 
     # closing database connection.
     finally:
