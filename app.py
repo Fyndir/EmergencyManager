@@ -150,7 +150,7 @@ def API_CAMION_SEND():
         if splittedData[0] == rawData:
             subArray = []
             for atomicData in splittedData[0].split(','):
-                if len(atomicData) > 0 and isStringIntOrFloat(atomicData):
+                if len(atomicData) > 0:
                     subArray.append(atomicData)
 
             # array integrity check
@@ -162,7 +162,7 @@ def API_CAMION_SEND():
             for data in rawData.split(';'):
                 subArray = []
                 for atomicData in data.split(','):
-                    if len(atomicData) > 0 and isStringIntOrFloat(atomicData):
+                    if len(atomicData) > 0:
                         subArray.append(atomicData)
 
                 # array integrity check

@@ -46,7 +46,6 @@ def insertIntoFireDatabase(allData):
                 fireY = dataArray[1]
                 fireItensity = dataArray[2]
                 query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
-                print(query)
                 cursor.execute(query)
             # query = query[:-1] # remove last ','
 
@@ -85,15 +84,17 @@ def updateFiretruckDatabase(allData):
         cursor = connection.cursor()
 
         # create query by extracting all atomic fields
-        camionX = allData[0]
-        camionY = allData[1]
-        camionImmat = allData[2]
-        query = "UPDATE t_camion SET camion_x=" + str(camionX) + ",camion_y=" + str(camionY) + " WHERE immatriculation_camion=" + str(camionImmat)
-        cursor.execute(query)
-        retVal = cursor.fetchall()
+        for triplet in allData:
+            camionX = triplet[0]
+            camionY = triplet[1]
+            camionImmat = triplet[2]
+            query = "UPDATE t_camion SET camion_x=" + str(camionX) + ",camion_y=" + str(camionY) + " WHERE immatriculation_camion='" + str(camionImmat) + "'"
+            print('\n', query, '\n')
+            cursor.execute(query)
+            retVal = cursor.fetchall()
 
     except (Exception, psycopg2.Error) as error :
-        print ("Error while inserting data into PostgreSQL", error)
+        print ("Error while inserting firetruck data into PostgreSQL: ", error)
 
     # closing database connection.
     finally:
