@@ -12,6 +12,8 @@ POSTGRES_DB_NAME = "cjczxqkt"
 #  Inserts into the fire database the new fire data 'allData'
 def insertIntoFireDatabase(allData):
     retVal = 'no data'
+    connection = None
+    cursor = None
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -61,6 +63,8 @@ def insertIntoFireDatabase(allData):
 #  Updates the firetruck database according to the new fire data 'allData'
 def updateFiretruckDatabase(allData):
     retVal = 'no data'
+    connection = None
+    cursor = None
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -93,6 +97,8 @@ def updateFiretruckDatabase(allData):
 #  Fetches from the PostGreSQL database the fire casernes positions and returns them
 def fetchCasernePosition():
     retVal = 'no data'
+    connection = None
+    cursor = None
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -120,6 +126,8 @@ def fetchCasernePosition():
 #  Fetches from the PostGreSQL database the fire positions and returns them
 def fetchFirePosition():
     retVal = 'no data'
+    connection = None
+    cursor = None
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,
@@ -147,6 +155,8 @@ def fetchFirePosition():
 #  Fetches from the PostGreSQL database the firetruck positions & ids and returns them
 def fetchFiretruckPosition():
     retVal = 'no data'
+    connection = None
+    cursor = None
     try:
         connection = psycopg2.connect(user=POSTGRES_USER,
                                       password=POSTGRES_PASSWORD,

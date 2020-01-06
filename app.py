@@ -117,8 +117,6 @@ def API_FIRE_SEND():
 # ---------------------------------------------------------------------------------
 @app.route('/camion/get')
 def API_CAMION_GET():
-    print('rturning below')
-    print(fetchFiretruckPosition())
     return jsonify(fetchFiretruckPosition())
 
 @app.route('/camion/send', methods=['POST'])
