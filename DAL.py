@@ -28,7 +28,6 @@ def openDatabaseConnection ():
 #  Inserts into the fire database the new fire data 'allData'
 def insertIntoFireDatabase(allData):
     retVal = 'no data'
-    global connection
     cursor = None
 
     # si on n'a rien envoyé, abort
@@ -36,6 +35,7 @@ def insertIntoFireDatabase(allData):
         return
 
     try:
+        global connection
         connection.autocommit = True
         cursor = connection.cursor()
         query = ''
