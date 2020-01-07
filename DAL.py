@@ -47,45 +47,49 @@ def insertIntoFireDatabase(allData):
     if len(allData) == 0:
         return
 
-    print(connection)
+    cursor = connection.cursor()
+    query = ''
 
-    try:
-        cursor = connection.cursor()
-        query = ''
+    # si on a envoyé juste un array
+    if not isinstance(allData[0], list):
+        fireX = allData[0]
+        fireY = allData[1]
+        fireItensity = allData[2]
+        query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+        print('')
+        print(query)
+        print('')
 
-        # si on a envoyé juste un array
-        if not isinstance(allData[0], list):
-            fireX = allData[0]
-            fireY = allData[1]
-            fireItensity = allData[2]
-            query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
-            print('')
-            print(query)
-            print('')
+        try:
             cursor.execute(query)
+        except (Exception, psycopg2.Error) as error :
+            print("Error while inserting data into PostgreSQL", error)
+        finally:
+            if(connection):
+                cursor.close()
 
-        # create query by extracting all atomic fields
-        else:
-            print('')
-            for dataArray in allData:
-                fireX = dataArray[0]
-                fireY = dataArray[1]
-                fireItensity = dataArray[2]
-                query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
-                print(query)
+    # create query by extracting all atomic fields
+    else:
+        print('')
+        for dataArray in allData:
+            fireX = dataArray[0]
+            fireY = dataArray[1]
+            fireItensity = dataArray[2]
+            query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+            print(query)
+
+            try:
                 cursor.execute(query)
-            print('')
-            # query = query[:-1] # remove last ','
+            except (Exception, psycopg2.Error) as error :
+                print("Error while inserting data into PostgreSQL", error)
+                pass # continue for( ) execution
 
-        # cursor.execute(query)
-
-    except (Exception, psycopg2.Error) as error :
-        raise NameError("Error while inserting data into PostgreSQL", error)
+        print('')
+        # query = query[:-1] # remove last ','
 
     # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
+    if(connection):
+        cursor.close()
 
 
 # -----------------------------------------------------------------------------------------
@@ -100,26 +104,28 @@ def updateFiretruckDatabase(allData):
     if len(allData) == 0:
         return
 
-    try:
-        cursor = connection.cursor()
+    cursor = connection.cursor()
 
-        # create query by extracting all atomic fields
-        for triplet in allData:
-            camionX = triplet[0]
-            camionY = triplet[1]
-            camionImmat = triplet[2]
-            query = 'UPDATE t_camion SET camion_x=' + str(camionX) + ',camion_y=' + str(camionY) + ' WHERE immatriculation_camion="' + str(camionImmat) + '"'
-            print('\n', query, '\n')
+    # create query by extracting all atomic fields
+    print('')
+    for triplet in allData:
+        camionX = triplet[0]
+        camionY = triplet[1]
+        camionImmat = triplet[2]
+        query = "UPDATE t_camion SET camion_x=" + str(camionX) + ",camion_y=" + str(camionY) + " WHERE immatriculation_camion='" + str(camionImmat) + "'"
+        print(query)
+
+        try:
             cursor.execute(query)
-            retVal = cursor.fetchall()
+        except (Exception, psycopg2.Error) as error :
+            print("Error while inserting firetruck data into PostgreSQL: ", error)
+            pass # continue for( ) execution
 
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while inserting firetruck data into PostgreSQL: ", error)
+    print('')
 
-    # closing database connection.
-    finally:
-        if(connection):
-            cursor.close()
+    # closing database connection
+    if(connection):
+        cursor.close()
 
 
 # -----------------------------------------------------------------------------------------
