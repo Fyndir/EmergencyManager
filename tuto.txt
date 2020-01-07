@@ -19,9 +19,7 @@ Pour communiquer avec PostgreSQL, nous avons besoin de plusieurs dépendances:
     CORS
     requests
     influxdb_client
-    polyline (pour décoder des polylines)
-    pigar (pour générer le fichier de dépendances nécessaire au bon fonctionnement d'Azur -> run la commage pigar pour le générer)
-(venv) $ pip install flask-sqlalchemy psycopg2 flask-cors requests influxdb_client polyline pigar
+(venv) $ pip install flask-sqlalchemy psycopg2 flask-cors requests influxdb_client
 
 Maintenant, sortir de l'environnement virtuel et entrer le nom du fichier de l'application (ici, app.py)
 > set FLASK_APP=app.py

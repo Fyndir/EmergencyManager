@@ -4,7 +4,6 @@ from collections import namedtuple
 from ctypes import c_char, c_wchar
 from flask_cors import CORS
 from DAL import *
-import polyline
 import threading
 import requests
 import time
@@ -198,8 +197,7 @@ def API_CAMION_SEND():
 @app.route('/api/polyline/decode', methods=['POST'])
 def API_POLYLINE_DECODE():
     rawData = request.data.decode('UTF-8')
-    # decodedPolyline = decodePolyline(rawData)
-    decodedPolyline = polyline.decode(rawData)
+    decodedPolyline = decodePolyline(rawData)
     return str(decodedPolyline)
 
 
