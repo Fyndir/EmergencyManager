@@ -4,6 +4,7 @@ from collections import namedtuple
 from ctypes import c_char, c_wchar
 from flask_cors import CORS
 from DAL import *
+import polyline
 import threading
 import requests
 import time
@@ -189,6 +190,19 @@ def API_CAMION_SEND():
     finally:
         return rawData
 
+
+# ---------------------------------------------------------------------------------
+#                              API UTILITARY ENDPOINTS
+# ---------------------------------------------------------------------------------
+
+@app.route('/api/polyline/decode', methods=['POST'])
+def API_POLYLINE_DECODE():
+    rawData = request.data.decode('UTF-8')
+    # decodedPolyline = decodePolyline(rawData)
+    decodedPolyline = polyline.decode(rawData)
+    return str(decodedPolyline)
+
+
 # start to send asynchronous data
 # async_sendSimulationDataToIOT()
 
@@ -226,6 +240,59 @@ def splitPaquet(encryptedData, segmentSize):
 
         if hasReachedEndOfData:
             hasFinishedSegmenting = True
+
+
+# -------------------------------------------------------------------------------------------------------
+# @brief
+#  Décode la polyligne 'polyline' au calme
+def decodePolyline (polyline):
+    str = ''
+    precison = ''
+    index = 0
+    lat = 0
+    lng = 0
+    coordinates = []
+    shift = 0
+    result = 0
+    byte = None
+    latitude_change = None
+    longitude_change = None
+    factor = 10**5
+
+    while index < len(str):
+        byte = None
+        shift = 0
+        result = 0
+
+        while True:
+            byte = str.charCodeAt(index) - 63
+            index += 1
+            result |= (byte & 0x1f) << shift
+            shift += 5
+
+            if byte >= 0x20:
+                break
+
+        latitude_change = ~(result >> 1) if (result & 1) else (result >> 1)
+        shift = result = 0
+
+        while True:
+            byte = str.charCodeAt(index) - 63
+            index += 1
+            result |= (byte & 0x1f) << shift
+            shift += 5
+
+            if byte >= 0x20:
+                break
+
+        longitude_change = ~(result >> 1) if (result & 1) else (result >> 1)
+
+        lat += latitude_change
+        lng += longitude_change
+
+        print(lat)
+        coordinates.append([lat / factor, lng / factor])
+    return coordinates
 
 
 # Il est essentiel d'ouvrir la connection avant toute interaction avec PostGre !
