@@ -123,7 +123,7 @@ def API_FIRE_SEND():
 #                               FIRETRUCK API ENDPOINTS
 # ---------------------------------------------------------------------------------
 
-@app.route('/fire/test/ignit', methods=['GET', 'POST'])
+@app.route('/fire/test/ignite', methods=['GET', 'POST'])
 def API_FIRE_TEST_IGNITE():
     try:
         insertIntoFireDatabase([[45.673979, 4.754071, 9], [45.75, 4.85, 4]])
