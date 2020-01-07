@@ -132,7 +132,7 @@ def API_FIRE_TEST_IGNITE():
     finally:
         return 'coucou antoine g allumé deu feu loul'
 
-@app.route('/fire/test/stopFaya', methods=['GET', 'POST'])
+@app.route('/fire/test/stop', methods=['GET', 'POST'])
 def API_FIRE_TEST_STOPFAYA():
     try:
         insertIntoFireDatabase([[45.673979, 4.754071, 0], [45.75, 4.85, 0]])
