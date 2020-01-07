@@ -77,15 +77,6 @@ def API_CASERNE_GET():
 def API_FIRE_GET():
     return jsonify(fetchFirePosition())
 
-@app.route('/fire/test', methods=['GET', 'POST'])
-def API_FIRE_TEST():
-    try:
-        insertIntoFireDatabase([[45.75, 4.85, 9], [45.75, 4.85, 3]])
-    except (Exception, psycopg2.Error) as error :
-        print(error)
-    finally:
-        return 'coucou antoine'
-
 @app.route('/fire/send', methods=['POST'])
 def API_FIRE_SEND():
     rawData = 'no data'
@@ -126,6 +117,29 @@ def API_FIRE_SEND():
         print(error)
     finally:
         return rawData
+
+
+# ---------------------------------------------------------------------------------
+#                               FIRETRUCK API ENDPOINTS
+# ---------------------------------------------------------------------------------
+
+@app.route('/fire/test/ignit', methods=['GET', 'POST'])
+def API_FIRE_TEST_IGNITE():
+    try:
+        insertIntoFireDatabase([[45.673979, 4.754071, 9], [45.75, 4.85, 4]])
+    except (Exception, psycopg2.Error) as error :
+        print(error)
+    finally:
+        return 'coucou antoine g allumé deu feu loul'
+
+@app.route('/fire/test/stopFaya', methods=['GET', 'POST'])
+def API_FIRE_TEST_STOPFAYA():
+    try:
+        insertIntoFireDatabase([[45.673979, 4.754071, 0], [45.75, 4.85, 0]])
+    except (Exception, psycopg2.Error) as error :
+        print(error)
+    finally:
+        return 'coucou antoine g éten tou lol'
 
 
 # ---------------------------------------------------------------------------------
@@ -212,6 +226,11 @@ def splitPaquet(encryptedData, segmentSize):
 
         if hasReachedEndOfData:
             hasFinishedSegmenting = True
+
+
+# Il est essentiel d'ouvrir la connection avant toute interaction avec PostGre !
+openDatabaseConnection()
+
     
 # main function, simply launching the server
 if __name__ == "__main__":

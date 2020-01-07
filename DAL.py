@@ -7,12 +7,28 @@ POSTGRES_USER = "cjczxqkt"
 POSTGRES_PASSWORD = "VA69fv50J_3JHnNqEOLQ5r7bs1wPQPXS"
 POSTGRES_DB_NAME = "cjczxqkt"
 
+
+connection = None
+
+
+# -----------------------------------------------------------------------------------------
+# @brief
+#  Opens the database connection for the whole server session. It is closed when the server
+# session ends
+def openDatabaseConnection ():
+    global connection
+    connection = psycopg2.connect(user=POSTGRES_USER,
+                                   password=POSTGRES_PASSWORD,
+                                   host=POSTGRES_URL,
+                                   port=POSTGRES_PORT,
+                                   database=POSTGRES_DB_NAME)
+
 # -----------------------------------------------------------------------------------------
 # @brief
 #  Inserts into the fire database the new fire data 'allData'
 def insertIntoFireDatabase(allData):
     retVal = 'no data'
-    connection = None
+    global connection
     cursor = None
 
     # si on n'a rien envoyé, abort
@@ -20,11 +36,6 @@ def insertIntoFireDatabase(allData):
         return
 
     try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
         connection.autocommit = True
         cursor = connection.cursor()
         query = ''
@@ -58,7 +69,6 @@ def insertIntoFireDatabase(allData):
     finally:
         if(connection):
             cursor.close()
-            connection.close()
 
 
 # -----------------------------------------------------------------------------------------
@@ -66,7 +76,7 @@ def insertIntoFireDatabase(allData):
 #  Updates the firetruck database according to the new fire data 'allData'
 def updateFiretruckDatabase(allData):
     retVal = 'no data'
-    connection = None
+    global connection
     cursor = None
 
     # si on n'a rien envoyé, abort
@@ -74,11 +84,6 @@ def updateFiretruckDatabase(allData):
         return
 
     try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
         connection.autocommit = True
         cursor = connection.cursor()
 
@@ -99,7 +104,6 @@ def updateFiretruckDatabase(allData):
     finally:
         if(connection):
             cursor.close()
-            connection.close()
 
 
 # -----------------------------------------------------------------------------------------
@@ -107,14 +111,9 @@ def updateFiretruckDatabase(allData):
 #  Fetches from the PostGreSQL database the fire casernes positions and returns them
 def fetchCasernePosition():
     retVal = 'no data'
-    connection = None
+    global connection
     cursor = None
     try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
         cursor = connection.cursor()
         cursor.execute("SELECT caserne_x, caserne_y FROM t_caserne")
         retVal = cursor.fetchall()
@@ -126,7 +125,6 @@ def fetchCasernePosition():
     finally:
         if(connection):
             cursor.close()
-            connection.close()
 
     return retVal
 
@@ -136,14 +134,9 @@ def fetchCasernePosition():
 #  Fetches from the PostGreSQL database the fire positions and returns them
 def fetchFirePosition():
     retVal = 'no data'
-    connection = None
+    global connection
     cursor = None
     try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
         cursor = connection.cursor()
         cursor.execute("SELECT pos_x,pos_y,pos_i FROM v_pos")
         retVal = cursor.fetchall()
@@ -155,7 +148,6 @@ def fetchFirePosition():
     finally:
         if(connection):
             cursor.close()
-            connection.close()
 
     return retVal
 
@@ -165,14 +157,9 @@ def fetchFirePosition():
 #  Fetches from the PostGreSQL database the firetruck positions & ids and returns them
 def fetchFiretruckPosition():
     retVal = 'no data'
-    connection = None
+    global connection
     cursor = None
     try:
-        connection = psycopg2.connect(user=POSTGRES_USER,
-                                      password=POSTGRES_PASSWORD,
-                                      host=POSTGRES_URL,
-                                      port=POSTGRES_PORT,
-                                      database=POSTGRES_DB_NAME)
         cursor = connection.cursor()
         cursor.execute("SELECT camion_x, camion_y, destination_x, destination_y, immatriculation_camion FROM v_camion")
         retVal = cursor.fetchall()
@@ -184,7 +171,6 @@ def fetchFiretruckPosition():
     finally:
         if(connection):
             cursor.close()
-            connection.close()
 
     if len(retVal) == 0:
         return 'no data'
