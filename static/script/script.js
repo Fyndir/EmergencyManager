@@ -157,11 +157,11 @@ function setupLeaflet ()
             container.onclick = function(){
                 const areMarkersShown = renderedMarkers.truckMarkers.areShown;
                 renderedMarkers.truckMarkers.areShown = !areMarkersShown;
-                for (let markerContainer of renderedMarkers.truckMarkers.markers) {
+                for (let markerAbstraction of renderedMarkers.truckMarkers.markers) {
                     if (areMarkersShown)
-                        mymap.removeLayer(markerContainer.marker);
+                        mymap.removeLayer(markerAbstraction.marker);
                     else
-                        mymap.addLayer(markerContainer.marker);
+                        mymap.addLayer(markerAbstraction.marker);
                 }
             }
             return container;
@@ -376,7 +376,8 @@ function addFirestationMarker (coordinates, mymap) {
 // @brief
 //  Adds a firetruck marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 
 // 'coordinates' argument, in the 'mymap' Leaflet map
-function addFiretruckMarker (coordinates, immatriculation, mymap) {
+function addFiretruckMarker (coordinates, immatriculation, mymap) 
+{
     console.log('%c>>> adding firetruck marker', 'color:#e67e22')
     const firestationIcon = L.icon({
         iconUrl: IMG_PATH + 'camion.gif',
@@ -384,8 +385,13 @@ function addFiretruckMarker (coordinates, immatriculation, mymap) {
         iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-    let marker = L.marker(coordinates, {icon: firestationIcon}).addTo(mymap);
-    marker.setZIndexOffset(1000);
+
+    let marker = L.marker(coordinates, {icon: firestationIcon});
+    if (renderedMarkers.truckMarkers.areShown) {
+        marker.addTo(mymap);
+        marker.setZIndexOffset(1000);
+    }
+
     renderedMarkers.truckMarkers.markers.push({immatriculation, marker});
 }
 
@@ -425,9 +431,12 @@ function addMovingFiretruck (steps, duration, immatriculation, mymap)
         // console.log('ze sui arrivé')
     })
 
-    mymap.addLayer(movingFiretruck);
-    renderedMarkers.truckMarkers.markers.push({immatriculation, marker: movingFiretruck});
+    if (renderedMarkers.truckMarkers.areShown)
+        mymap.addLayer(movingFiretruck);
+
     movingFiretruck.start();
+
+    renderedMarkers.truckMarkers.markers.push({immatriculation, marker: movingFiretruck});
 }
 
 
