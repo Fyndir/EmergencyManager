@@ -18,20 +18,9 @@ INFLUXDB_CLIENT_URL = 'https://us-west-2-1.aws.cloud2.influxdata.com'
 BUCKET_ID = "Transversal"
 
 
-# ---------------------------------------------------------------------------------------------
-# @brief
-#  Returns True if 'stringo' is an integer or a float, Flase otherwise
-def isStringIntOrFloat(stringo):
-    if stringo.isdigit():
-        return True
-    if stringo.replace('.', '', 1).isdigit() and stringo.count('.') < 2:
-        return True
-    return False
-
-
 # -----------------------------------------------------------------------------------------
 # @brief
-#  Uh... Ok I don't know yet lolilol
+#  Envoie et stock dans le cloud la donnée 'data'
 def writeCloudData(data):
     try:
         client = InfluxDBClient(INFLUXDB_CLIENT_URL, INFLUXDB_CLIENT_TOKEN)
@@ -52,6 +41,17 @@ def async_sendSimulationDataToIOT():
     # threading.Timer(INTERVAL_BETWEEN_CALLS, async_sendSimulationDataToIOT).start()
     # result = requests.post('http://127.0.0.1:5000/test', data='putasse')
     # print(result)
+
+
+# ---------------------------------------------------------------------------------------------
+# @brief
+#  Returns True if 'stringo' is an integer or a float, Flase otherwise
+def isStringIntOrFloat(stringo):
+    if stringo.isdigit():
+        return True
+    if stringo.replace('.', '', 1).isdigit() and stringo.count('.') < 2:
+        return True
+    return False
 
 
 # ---------------------------------------------------------------------------------

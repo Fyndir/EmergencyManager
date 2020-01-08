@@ -38,6 +38,7 @@ def openDatabaseConnection ():
 # @brief
 #  Inserts into the fire database the new fire data 'allData'
 def insertIntoFireDatabase(allData):
+    print('')
     print('> Inserting into FIRE database...')
     retVal = 'no data'
     cursor = None
@@ -56,7 +57,6 @@ def insertIntoFireDatabase(allData):
         fireY = allData[1]
         fireItensity = allData[2]
         query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
-        print('')
         print(query)
         print('')
 
@@ -70,12 +70,11 @@ def insertIntoFireDatabase(allData):
 
     # create query by extracting all atomic fields
     else:
-        print('')
         for dataArray in allData:
             fireX = dataArray[0]
             fireY = dataArray[1]
             fireItensity = dataArray[2]
-            query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+            query = "INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES " + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
             print(query)
 
             try:
