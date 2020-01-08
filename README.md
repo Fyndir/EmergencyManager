@@ -41,6 +41,8 @@ Voici le diagramme de séquence associé au fonctionnement général de notre ap
 
 ![Image of sequence diag](https://github.com/Fyndir/EmergencyManager/blob/master/DiagrammeS%C3%A9quence_main.png)
 
+### API endpoints
+
 Nous avons mis à disposition un certain nombre d'endpoints d'API :
   - [GET] **/caserne/get** : retourne l'ensemble des positions des casernes disponibles dans la base de données
   - [GET] **/fire/get** : retourne les IDs, les positions et les intensités (cad la gravité de l'incendie, 0 étant associé à un bâtiment sain) de chaque position susceptible d'être enflammée
