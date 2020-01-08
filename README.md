@@ -37,6 +37,10 @@ Son role est de stocker les données des feux et d'affecté les camions au dit f
 
 ### Fonctionnement
 
+Voici le diagramme de séquence associé au fonctionnement général de notre application. Ce fonctionnement permet un rendu en temps réel de l'avancée des camions, du traitement des incendies et, finalement, de l'ensemble des process backend qu'il est souhaitable d'observer dans le front.
+
+![Image of sequence diag](https://github.com/Fyndir/EmergencyManager/blob/master/DiagrammeS%C3%A9quence_main.png)
+
 Nous avons mis à disposition un certain nombre d'endpoints d'API :
   - [GET] **/caserne/get** : retourne l'ensemble des positions des casernes disponibles dans la base de données
   - [GET] **/fire/get** : retourne les IDs, les positions et les intensités (cad la gravité de l'incendie, 0 étant associé à un bâtiment sain) de chaque position susceptible d'être enflammée
