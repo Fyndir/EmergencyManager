@@ -126,7 +126,7 @@ def API_FIRE_SEND():
 @app.route('/fire/test/ignite', methods=['GET', 'POST'])
 def API_FIRE_TEST_IGNITE():
     try:
-        insertIntoFireDatabase([[45.673979, 4.754071, 9], [45.75, 4.85, 4]])
+        insertIntoFireDatabase([[75, 9], [76, 4]])
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
@@ -135,7 +135,7 @@ def API_FIRE_TEST_IGNITE():
 @app.route('/fire/test/stop', methods=['GET', 'POST'])
 def API_FIRE_TEST_STOPFAYA():
     try:
-        insertIntoFireDatabase([[45.673979, 4.754071, 0], [45.75, 4.85, 0]])
+        insertIntoFireDatabase([[75, 0], [76, 0]])
     except (Exception, psycopg2.Error) as error :
         print(error)
     finally:
