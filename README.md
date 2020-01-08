@@ -36,3 +36,15 @@ Son role est de stocker les données des feux et d'affecté les camions au dit f
 ## Le serveur Emergency Manager
 
 ### Fonctionnement
+
+Nous avons mis à disposition un certain nombre d'endpoints d'API :
+  - [GET] **/caserne/get** : retourne l'ensemble des positions des casernes disponibles dans la base de données
+  - [GET] **/fire/get** : retourne les IDs, les positions et les intensités (cad la gravité de l'incendie, 0 étant associé à un bâtiment sain) de chaque position susceptible d'être enflammée
+  - [POST] **/fire/send** : en envoyant un ID couplé à une intensité, cet endpoint permet de mettre à jour l'intensité de la position identifiée par l'idientifiant ID
+  - [GET] **/camion/get** : retourne l'ensemble des positions des camions accessibles depuis la base de données
+  - [POST] **/camion/send** : en envoyant une position et une immatriculation, cet endpoint permet de mettre à jour la position du camion identifié par son immatriculation, en base de données
+  - [POST] **/api/polyline/decode** : en envoyant une polyline encodée, cet endpoint renvoie la liste des coordonnées géographiques résultantes du décodage de la polyligne envoyée
+  
+A but de test, nous avons déployé deux endpoints de test rapide :
+  - [POST] **/fire/test/ignite** : pour une liste d'ID de taille variable et une intensité associée à chacune, met le feu aux positions géographiques qui leurs sont associées
+  - [POST] **/fire/test/stop** : pour une liste d'ID de taille variable, éteint les feux de toutes les positions géographiques associées (cad, set de l'intensité à 0)
