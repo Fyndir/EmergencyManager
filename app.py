@@ -99,9 +99,8 @@ def API_FIRE_SEND():
             if (len(subArray) == 2):
                 exploitableData.append(subArray)
 
-        # sinon, on a envoyé plusieurs triplets, donc simplement faut les traiter un par un
+        # sinon, on a envoyé plusieurs doublets, donc simplement faut les traiter un par un
         else:
-            print('envoyé plusieurs triplets')
             for data in rawData.split(';'):
                 subArray = []
                 for atomicData in data.split(','):

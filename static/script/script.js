@@ -20,6 +20,7 @@ let laFumeeEstEnTrainDeSeteindre = [];
 
 let locationsCoordinates = [];
 let firetrucks = []; // contains all the firetrucks data, such as current position, next position...
+let firetrucksImageMap = []; // associe, à une immatriculation, une image de camion fixe
 let renderedMarkers = {
     fireMarkers: {
         areShown: true,
@@ -67,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () =>
     // reset
     locationsCoordinates = [];
     firetrucks = [];
+    firetrucksImageMap = [];
 
     let mymap = setupLeaflet();
     addCPEMarker(mymap);
@@ -151,7 +153,7 @@ function setupLeaflet ()
             container.style.width = '30px';
             container.style.height = '30px';
             
-            container.style.backgroundImage = 'url("' + IMG_PATH + 'camion.gif")';
+            container.style.backgroundImage = 'url("' + IMG_PATH + 'camion1.gif")';
             container.style.backgroundSize = "30px 30px";
         
             container.onclick = function(){
@@ -374,13 +376,33 @@ function addFirestationMarker (coordinates, mymap) {
 
 // --------------------------------------------------------------------------------------------------------------
 // @brief
+//  Si le camion immatriculé 'immatriculation' a déjà été asocié à un gif de camion, cette fonction retourne
+// le numéro de ce gif. Autrement, cette fonction assigne à cette immatriculation un numéro de gif aléatoire
+// et renvoie ce numéro
+function getRegisteredCamionImageNumber (immatriculation) 
+{
+    const registeredImmatriculationImage = firetrucksImageMap.find(e => e.immatriculation == immatriculation);
+    let camionImageNumber;
+    if (typeof registeredImmatriculationImage != 'undefined')
+        camionImageNumber = registeredImmatriculationImage.imageNumber;
+    else {
+        camionImageNumber = rand(1, 4);
+        firetrucksImageMap.push({immatriculation, imageNumber: camionImageNumber});
+    }
+
+    return camionImageNumber;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// @brief
 //  Adds a firetruck marker in the Leaflet map 'mymap' at coordinates [lat, long] represented by the 
 // 'coordinates' argument, in the 'mymap' Leaflet map
 function addFiretruckMarker (coordinates, immatriculation, mymap) 
 {
-    console.log('%c>>> adding firetruck marker', 'color:#e67e22')
+    let camionImageNumber = getRegisteredCamionImageNumber(immatriculation);
     const firestationIcon = L.icon({
-        iconUrl: IMG_PATH + 'camion.gif',
+        iconUrl: IMG_PATH + `camion${camionImageNumber}.gif`,
         iconSize:     [60, 47], // size of the icon
         iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
@@ -401,10 +423,13 @@ function addFiretruckMarker (coordinates, immatriculation, mymap)
 //  Adds a marker in the Leaflet map 'mymap' form the coordinates 'start' to 'end' and a duration of 'duration'
 // This moving firetruck must be identified by its immatriculation 'immatriculation'
 // expressed in milliseconds
+// @note
+//  The 'duration' must be expressed in ms
 function addMovingFiretruck (steps, duration, immatriculation, mymap) 
 {
-    const movingMarkerIcon = L.icon({
-        iconUrl: IMG_PATH + 'camion.gif',
+    let camionImageNumber = getRegisteredCamionImageNumber(immatriculation);
+    const firetruckIcon = L.icon({
+        iconUrl: IMG_PATH + `camion${camionImageNumber}.gif`,
         iconSize:     [60, 47], // size of the icon
         iconAnchor:   [30, 30], // point of the icon which will correspond to marker's location
         popupAnchor:  [0, 50] // point from which the popup should open relative to the iconAnchor
@@ -412,17 +437,17 @@ function addMovingFiretruck (steps, duration, immatriculation, mymap)
 
     // drawing the line the moving marker will follow
     let coordinateArray = [...steps];
-    let myPolyline = L.polyline(coordinateArray);
-    myPolyline.addTo(mymap);
-    renderedPolylines.push({immatriculation, polyline: myPolyline});
+    // let myPolyline = L.polyline(coordinateArray);
+    // myPolyline.addTo(mymap);
+    // renderedPolylines.push({immatriculation, polyline: myPolyline});
 
-    // here is the moving marker (6 seconds animation)
+    // here is the moving marker
     let movingFiretruck = L.Marker.movingMarker(
         coordinateArray, 
         duration, 
         { 
-            autostart: false,
-            icon: movingMarkerIcon
+            autostart: true,
+            icon: firetruckIcon
         }
     );
 
@@ -434,9 +459,8 @@ function addMovingFiretruck (steps, duration, immatriculation, mymap)
     if (renderedMarkers.truckMarkers.areShown)
         mymap.addLayer(movingFiretruck);
 
-    movingFiretruck.start();
-
     renderedMarkers.truckMarkers.markers.push({immatriculation, marker: movingFiretruck});
+    movingFiretruck.start();
 }
 
 
@@ -606,9 +630,6 @@ function updateIncendieData (newDataset, mymap)
 //  In the Leaflet map 'mymap', updates all the displayed firetruck with the new 'newDataset'
 function updateFiretruckData (firetruckData, mymap) 
 {
-    console.log('%cUpdating firetruck data', 'color: #c0392b;font-size:1.3em;font-weight:bold')
-    console.log(firetruckData.length + ' firetruck à update en raw data')
-    console.log('%cRENDERED FIRETRUCK MARKERS: ' + renderedMarkers.truckMarkers.markers.length, 'color:#6ab04c')
     for (let data of firetruckData) 
     {
         const dataCurrentCoord = [data[0], data[1]]; // are updated by the backend, real time camion position
@@ -626,7 +647,6 @@ function updateFiretruckData (firetruckData, mymap)
                 futureCoord: dataCurrentCoord,
                 destinationCoord: dataDestinationCoord
             })
-            console.log('> buffering a firetruck')
             addFiretruckMarker(dataCurrentCoord, dataImmatriculation, mymap);
 
             // ajout de la polyligne du trajet du camion vers sa destination si il doit bouger
@@ -640,8 +660,6 @@ function updateFiretruckData (firetruckData, mymap)
             let markerContainer = renderedMarkers.truckMarkers.markers.find(e => e.immatriculation = dataImmatriculation);
             if (typeof markerContainer != 'undefined') 
             {
-                console.log('%c> Updating a firetruck', 'color: #9b59b6')
-
                 // maj firetruck data
                 bufferedFiretruck.currentCoord = bufferedFiretruck.futureCoord;
                 bufferedFiretruck.futureCoord = dataCurrentCoord;
@@ -650,7 +668,7 @@ function updateFiretruckData (firetruckData, mymap)
                 clearSpecificFiretruck(dataImmatriculation, mymap);
                 addMovingFiretruck(
                     [bufferedFiretruck.currentCoord, bufferedFiretruck.futureCoord], // [from, to]
-                    0.5, // duration in second
+                    1000, // duration in second
                     dataImmatriculation, // immatriculation du camion qu'on déplace
                     mymap // la map Leaflet dans laquelle le camion sera rendered
                 );
@@ -658,7 +676,6 @@ function updateFiretruckData (firetruckData, mymap)
                 // si la destination a changé, mettre à jour la polyligne du trajet du camion
                 if (!areDoubletEqual(bufferedFiretruck.destinationCoord, dataDestinationCoord)) 
                 {
-                    console.log('%cCAMION CHANGE SA POLYLINE', 'color:red;font-size:2em')
                     bufferedFiretruck.destinationCoord = dataDestinationCoord;
                     // clearSpecificPolyline(bufferedFiretruck.immatriculation, mymap);
                     // fetchAndDisplayRoute(bufferedFiretruck.currentCoord, dataDestinationCoord, dataImmatriculation, mymap);
