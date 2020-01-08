@@ -53,10 +53,9 @@ def insertIntoFireDatabase(allData):
 
     # si on a envoyé juste un array
     if not isinstance(allData[0], list):
-        fireX = allData[0]
-        fireY = allData[1]
-        fireItensity = allData[2]
-        query = 'INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES ' + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+        fireId = allData[0]
+        fireItensity = allData[1]
+        query = 'INSERT INTO v_pos (id_pos, pos_i) VALUES ' + "(" + str(fireId) + ", " + str(fireItensity) + ");"
         print(query)
         print('')
 
@@ -71,10 +70,9 @@ def insertIntoFireDatabase(allData):
     # create query by extracting all atomic fields
     else:
         for dataArray in allData:
-            fireX = dataArray[0]
-            fireY = dataArray[1]
-            fireItensity = dataArray[2]
-            query = "INSERT INTO v_pos (pos_x, pos_y, pos_i) VALUES " + "(" + str(fireX) + ", " + str(fireY) + ", " + str(fireItensity) + ");"
+            fireId = dataArray[0]
+            fireItensity = dataArray[1]
+            query = "INSERT INTO v_pos (id_pos, pos_i) VALUES " + "(" + str(fireId) + ", " + str(fireItensity) + ");"
             print(query)
 
             try:
@@ -159,7 +157,7 @@ def fetchFirePosition():
     cursor = None
     try:
         cursor = connection.cursor()
-        cursor.execute("SELECT pos_x,pos_y,pos_i FROM v_pos")
+        cursor.execute("SELECT id_pos, pos_x, pos_y, pos_i FROM v_pos")
         retVal = cursor.fetchall()
 
     except (Exception, psycopg2.Error) as error :

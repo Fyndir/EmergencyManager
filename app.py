@@ -96,7 +96,7 @@ def API_FIRE_SEND():
                     subArray.append(atomicData)
 
             # array integrity check
-            if (len(subArray) == 3):
+            if (len(subArray) == 2):
                 exploitableData.append(subArray)
 
         # sinon, on a envoyé plusieurs triplets, donc simplement faut les traiter un par un
@@ -109,7 +109,7 @@ def API_FIRE_SEND():
                         subArray.append(atomicData)
 
                 # array integrity check
-                if (len(subArray) == 3):
+                if (len(subArray) == 2):
                     exploitableData.append(subArray)
         
         insertIntoFireDatabase(exploitableData)

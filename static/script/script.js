@@ -526,8 +526,9 @@ function updateIncendieData (newDataset, mymap)
     locationsCoordinates = newDataset;
     if (shouldClearMap) clearMap(mymap);
     for (const data of locationsCoordinates) {
-        const coordinates = [data[0], data[1]];
-        const intensity = data[2];
+        const posId = data[0]
+        const coordinates = [data[1], data[2]];
+        const intensity = data[3];
 
         const wasFireLitBefore = renderedMarkers.fireMarkers.litFires.find(e => areDoubletEqual(e, coordinates)) != undefined;
         const fumeeSeteintTelle = laFumeeEstEnTrainDeSeteindre.find(e => areDoubletEqual(e, coordinates)) != undefined;
@@ -629,9 +630,9 @@ function updateFiretruckData (firetruckData, mymap)
             addFiretruckMarker(dataCurrentCoord, dataImmatriculation, mymap);
 
             // ajout de la polyligne du trajet du camion vers sa destination si il doit bouger
-            if (!areDoubletEqual(dataCurrentCoord, dataDestinationCoord)) {
-                fetchAndDisplayRoute(dataCurrentCoord, dataDestinationCoord, dataImmatriculation, mymap);
-            }
+            // if (!areDoubletEqual(dataCurrentCoord, dataDestinationCoord)) {
+            //     fetchAndDisplayRoute(dataCurrentCoord, dataDestinationCoord, dataImmatriculation, mymap);
+            // }
         }
 
         else {
@@ -659,8 +660,8 @@ function updateFiretruckData (firetruckData, mymap)
                 {
                     console.log('%cCAMION CHANGE SA POLYLINE', 'color:red;font-size:2em')
                     bufferedFiretruck.destinationCoord = dataDestinationCoord;
-                    clearSpecificPolyline(bufferedFiretruck.immatriculation, mymap);
-                    fetchAndDisplayRoute(bufferedFiretruck.currentCoord, dataDestinationCoord, dataImmatriculation, mymap);
+                    // clearSpecificPolyline(bufferedFiretruck.immatriculation, mymap);
+                    // fetchAndDisplayRoute(bufferedFiretruck.currentCoord, dataDestinationCoord, dataImmatriculation, mymap);
                 }
             }
         }
