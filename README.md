@@ -29,7 +29,7 @@ Son role est de transmettre les information du serveur de simulation au serveur 
 
 Son role est d'inserer les données qu'il recoit dans la base de données à l'aide d'API. Il permet également d'afficher en temps réel le contenu de la base (feu / déplacement des camions)
 
-* La base de données de l'emergency Manager : 
+* La base de données de l'emergency Manager (https://github.com/Fyndir/BddEmergencyManager)): 
 
 Son role est de stocker les données des feux et d'affecté les camions au dit feux à l'aide d'un ensemble de trigger SQL
 
