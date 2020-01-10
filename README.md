@@ -12,6 +12,10 @@ Ce projet consiste à simuler des incendies sur une ville, et leur prise en char
 
 le projet se découpe en plusieurs briques : 
 
+* Le réseau Virtuel (https://github.com/Tenebry/Network_On_Fire):
+
+Le but de cette brique est de recreer l'environnement informatique des casernes avec des LAN virtuel interconnecté via une backbone. C'est depuis des VM branchées sur ce réseau que l'on peux accèder à l'ensemble des services.
+
 * Le centre de simulation (https://github.com/Fyndir/ClientJavaSimulation) : 
 
 Son rôle est de générer des feux dont les coordonnées, l’intensité et la fréquence sont à définir dans le programme. Ces données sont par la site transmit au serveur Flash de simulation à l'aide d'une API mise à disposition par le dit serveur.
@@ -21,7 +25,7 @@ Par la site la gestion des déplacements des camions sera également gérer par 
 
 Son role est d'afficher la simulation en temps réel pour voir l'état des feu sur une map. Il permet également de récuper les données à un instant T grace a une URL qui renvoi les données sous un format prédéfinies.
 
-* La brique IOT :
+* La brique IOT (https://github.com/Neexos/ProjectTrans):
 
 Son role est de transmettre les information du serveur de simulation au serveur d'emergency manager à l'aide de deux microcontrolleur , 2 rasberry et d'APIs devellopées sur les deux serveurs.
 
