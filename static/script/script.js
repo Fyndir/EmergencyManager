@@ -715,8 +715,8 @@ function updateFiretruckData (firetruckData, mymap)
                 if (!areDoubletEqual(bufferedFiretruck.destinationCoord, dataDestinationCoord)) 
                 {
                     bufferedFiretruck.destinationCoord = dataDestinationCoord;
-                    // clearSpecificPolyline(bufferedFiretruck.immatriculation, mymap);
-                    // fetchAndDisplayRoute(bufferedFiretruck.currentCoord, dataDestinationCoord, dataImmatriculation, mymap);
+                    clearSpecificPolyline(bufferedFiretruck.immatriculation, mymap);
+                    fetchAndDisplayRoute(bufferedFiretruck.currentCoord, dataDestinationCoord, dataImmatriculation, mymap);
                 }
             }
         }
