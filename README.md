@@ -21,7 +21,7 @@ Par la site la gestion des déplacements des camions sera également gérer par 
 
 Son role est d'afficher la simulation en temps réel pour voir l'état des feu sur une map. Il permet également de récuper les données à un instant T grace a une URL qui renvoi les données sous un format prédéfinies.
 
-* La brique IOT :
+* La brique IOT (https://github.com/Neexos/ProjectTrans):
 
 Son role est de transmettre les information du serveur de simulation au serveur d'emergency manager à l'aide de deux microcontrolleur , 2 rasberry et d'APIs devellopées sur les deux serveurs.
 
