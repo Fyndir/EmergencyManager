@@ -10,6 +10,10 @@ let bufferedAudio = {
     extinguish: new Audio(SOUND_PATH + 'extinguish.wav'),
     boom: new Audio(SOUND_PATH + 'boom.wav'),
     waw: new Audio(SOUND_PATH + 'waw.mp3'),
+
+    tchoutchou: new Audio(SOUND_PATH + '/camion/tchoutchou.wav'),
+    camionStop: new Audio(SOUND_PATH + '/camion/camionStop.wav'),
+    sirene: new Audio(SOUND_PATH + '/camion/sirene.wav'),
 }
 
 // this array is filled with all the fire [lat,long] for which we have already popped ze petits bonhommes
@@ -128,11 +132,11 @@ function setupLeaflet ()
                 const areMarkersShown = renderedMarkers.fireMarkers.areShown;
                 renderedMarkers.fireMarkers.isLocked = areMarkersShown;
                 renderedMarkers.fireMarkers.areShown = !areMarkersShown;
-                for (let marker of renderedMarkers.fireMarkers.markers) {
+                for (let markerAbstraction of renderedMarkers.fireMarkers.markers) {
                     if (areMarkersShown)
-                        mymap.removeLayer(marker);
+                        mymap.removeLayer(markerAbstraction.marker);
                     else
-                        mymap.addLayer(marker);
+                        mymap.addLayer(markerAbstraction.marker);
                 }
 
                 updateIncendieData([], mymap) // empty array to use already existing data
@@ -344,7 +348,7 @@ function addFireMarker (coordinates, intensity, mymap)
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: fireIcon}).addTo(mymap);
-    renderedMarkers.fireMarkers.markers.push(marker);
+    renderedMarkers.fireMarkers.markers.push({coordinates, marker});
     renderedMarkers.fireMarkers.litFires.push(coordinates);
 
     // add onclick popup
@@ -370,7 +374,7 @@ function addFirestationMarker (coordinates, mymap) {
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
     let marker = L.marker(coordinates, {icon: firestationIcon}).addTo(mymap);
-    renderedMarkers.firestationMarkers.markers.push(marker);
+    renderedMarkers.firestationMarkers.markers.push({coordinates, marker});
 }
 
 
@@ -446,21 +450,54 @@ function addMovingFiretruck (steps, duration, immatriculation, mymap)
         coordinateArray, 
         duration, 
         { 
-            autostart: true,
+            autostart: false,
             icon: firetruckIcon
         }
     );
 
-    // on arrival tu coco
-    movingFiretruck.addEventListener('end', () => {
-        // console.log('ze sui arrivé')
+    // on départ du sancho
+    movingFiretruck.addEventListener('start', () => 
+    {
+        const startCoordinates = steps[0];
+        const isFiretruckMoving = !areDoubletEqual(steps[0], steps[1]);
+
+        // si on part de la station
+        const isLeavingFirestation = typeof renderedMarkers.firestationMarkers.markers.find(e => areDoubletEqual(e.coordinates, startCoordinates)) != 'undefined';
+        if (isFiretruckMoving && isLeavingFirestation)
+            console.log('Un camion quitte sa station !')
+
+        // si on part de feu l'incendie
+        const isLeavingFire = typeof renderedMarkers.fireMarkers.markers.find(e => areDoubletEqual(e.coordinates, startCoordinates)) != 'undefined';
+        const isLeavingIdle = typeof renderedMarkers.buildingMarkers.markers.find(e => areDoubletEqual(e.coordinates, startCoordinates)) != 'undefined';
+        if (isFiretruckMoving && (isLeavingFire || isLeavingIdle))
+            console.log('Un camion quitte le feu qu\'il vient d\'éteindre !')
     })
 
-    if (renderedMarkers.truckMarkers.areShown)
-        mymap.addLayer(movingFiretruck);
+    // on arrival tu coco
+    movingFiretruck.addEventListener('end', () => 
+    {
+        console.log('end')
+        const endCoordinates = steps[1];
+
+        console.log(endCoordinates)
+
+        // si on est arrivé à un feu
+        const hasArrivedToFire = typeof renderedMarkers.fireMarkers.markers.find(e => areDoubletEqual(e.coordinates, endCoordinates)) != 'undefined';
+        const hasArrivedToIdle = typeof renderedMarkers.buildingMarkers.markers.find(e => areDoubletEqual(e.coordinates, endCoordinates)) != 'undefined';
+        if (hasArrivedToFire || hasArrivedToIdle)
+            console.log('Un camion vient d\'arriver à un feu !')
+
+        // si on est arrivé à une station
+        const hasArrivedToFirestation = typeof renderedMarkers.firestationMarkers.markers.find(e => areDoubletEqual(e.coordinates, endCoordinates)) != 'undefined';
+        if (hasArrivedToFirestation)
+            console.log('Un camion vient de rentrer à sa caserne !')
+    })
 
     renderedMarkers.truckMarkers.markers.push({immatriculation, marker: movingFiretruck});
-    movingFiretruck.start();
+    if (renderedMarkers.truckMarkers.areShown) {
+        mymap.addLayer(movingFiretruck);
+        movingFiretruck.start();
+    }
 }
 
 
@@ -630,6 +667,9 @@ function updateIncendieData (newDataset, mymap)
 //  In the Leaflet map 'mymap', updates all the displayed firetruck with the new 'newDataset'
 function updateFiretruckData (firetruckData, mymap) 
 {
+    console.log('%c> ' + firetrucks.length + ' buffered firetrucks', 'color:#9b59b6')
+    console.log('%c> ' + renderedMarkers.truckMarkers.markers.length + ' rendered firetrucks', 'color:#10ac84')
+    console.log('')
     for (let data of firetruckData) 
     {
         const dataCurrentCoord = [data[0], data[1]]; // are updated by the backend, real time camion position
@@ -650,9 +690,10 @@ function updateFiretruckData (firetruckData, mymap)
             addFiretruckMarker(dataCurrentCoord, dataImmatriculation, mymap);
 
             // ajout de la polyligne du trajet du camion vers sa destination si il doit bouger
-            // if (!areDoubletEqual(dataCurrentCoord, dataDestinationCoord)) {
-            //     fetchAndDisplayRoute(dataCurrentCoord, dataDestinationCoord, dataImmatriculation, mymap);
-            // }
+            if (!areDoubletEqual(dataCurrentCoord, dataDestinationCoord)) {
+                clearSpecificPolyline(dataImmatriculation, mymap);
+                fetchAndDisplayRoute(dataCurrentCoord, dataDestinationCoord, dataImmatriculation, mymap);
+            }
         }
 
         else {
@@ -701,8 +742,8 @@ async function async_gatherDataRegularly (delay, mymap) {
 // @brief
 //  Clears all the markers rendered in the Leaflet map 'mymap'
 function clearAllMarkers (mymap) {
-    for (let marker of renderedMarkers.fireMarkers.markers) {
-        mymap.removeLayer(marker);
+    for (let markerAbstraction of renderedMarkers.fireMarkers.markers) {
+        mymap.removeLayer(markerAbstraction.marker);
     }
     for (let marker of renderedMarkers.buildingMarkers.markers) {
         mymap.removeLayer(marker);
@@ -778,13 +819,6 @@ function clearSpecificFiretruck (immatriculation, mymap)
         }
     }
     renderedMarkers.truckMarkers.markers = reconstructedArray;
-
-    // removing buffered firetruck from the firetruck[] array
-    // reconstructedArray = [];
-    // for (let bufferedFiretruck of firetrucks)
-    //     if (bufferedFiretruck.immatriculation != immatriculation)
-    //         reconstructedArray.push(bufferedFiretruck);
-    // firetrucks = reconstructedArray;
 }
 
 
@@ -880,7 +914,7 @@ function createAndDisplayPetitBonhomme (steps, mymap) {
         pathToFollow, 
         6000, 
         { 
-            autostart: true,
+            autostart: false,
             icon: petitBonhommeIcon
         }
     );
