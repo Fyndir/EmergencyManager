@@ -230,19 +230,16 @@ function fetchAndDisplayRoute (from, to, immatriculation, mymap)
                 });
                 decodedPolyline.addTo(mymap);
                 renderedPolylines.push({immatriculation, polyline: decodedPolyline});
-
-                // addMovingFiretruck(decodedPolyline['_latlngs'], travelTime, immatriculation, mymap);
             });
         } catch(e) {
-            console.error('Too many calls to the OSRM API. Try again later ('+e+')')
+            console.error('Too many calls to the OSRM API. Retrying')
+            fetchAndDisplayRoute(from, to, immatriculation, mymap);
             
             // drawing the line the moving marker will follow
-            let coordinateArray = [from, to];
-            let straightLine = L.polyline(coordinateArray);
-            straightLine.addTo(mymap);
-            renderedPolylines.push({immatriculation, polyline: straightLine});
-
-            // addMovingFiretruck([from, to], travelTime, immatriculation, mymap);
+            // let coordinateArray = [from, to];
+            // let straightLine = L.polyline(coordinateArray);
+            // straightLine.addTo(mymap);
+            // renderedPolylines.push({immatriculation, polyline: straightLine});
         }
     });
 }
